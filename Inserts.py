@@ -1,5 +1,45 @@
-first_names = ["Raymond", "Ichigo", "Naruto", "Omar", "Liangrui", "Byakuya"]
-last_names = ["Lieu", "Kurosaki", "Uzumaki", "Zioueche", "Lu", "Kuchiki"]
+import datetime
+
+names = ["Raymond Lieu", \
+         "Liangrui Lu", \
+         "Omar Zioueche", \
+         "Ichigo Kurosaki", \
+         "Byakuya Kuchiki", \
+         "Urahara Kisuke", \
+         "Hitsuguya Toshiro", \
+         "Renji Abarai", \
+         "Aizen Sousuke", \
+         "Kenpachi Zaraki", \
+         "Naruto Uzumaki", \
+         "Sasuke Uchiha", \
+         "Itachi Uchiha", \
+         "Madara Uchiha", \
+         "Kakashi Hatake", \
+         "Hinata Hyuga", \
+         "Oga Tatsumi", \
+         "Aoi Kuneida", \
+         "Tatsuya Shiba", \
+         "Miyuki Shiba", \
+         "Moroha Haimura"]
+
+results = [["DEAD", "Doctor messed up"], \
+           ["ALIVE", "Cannot believe the doctor actually did it"], \
+           ["COMATOSE", "Weird..."]]
+
+first_names = []
+last_names = []
+
+date = datetime.date.today()
+
+f1 = "RAWTOHEX('Test Thumbnail')"
+f2 = "RAWTOHEX('Test Regular Size')"
+f3 = "RAWTOHEX('Test Full Size')"
+
+for i in names:
+        name = i.split(" ")
+        first_names.append(name[0])
+        last_names.append(name[len(name)-1])
+
 
 # persons
 for i in range(len(first_names)):
@@ -9,7 +49,7 @@ for i in range(len(first_names)):
           "'" + last_names[i] + "'" + ", " + \
           "'" + str(i) + "Edmonton" + "'" + ", " + \
           "'" + first_names[i] + "@hotmail.com" + "'" + ", " + \
-          "'" + "780" + str(i)*3 + str(i)*4 + "'" + \
+          "'" + "780" + str(i%9)*3 + str(i%9)*4 + "'" + \
          ");")
 
 # users
@@ -20,7 +60,7 @@ for i in range(len(first_names)):
               "'" + "pwd" "'" + ", " + \
               "'" + "a" + "'" + ", " + \
               str(i) + ", " + \
-              "null" + \
+              "'" + (date + datetime.timedelta(days=i)).strftime('%d-%b-%Y') + "'" + \
               ");")
     if (i%2 == 0):
         print("Insert into users values (" + \
@@ -28,7 +68,7 @@ for i in range(len(first_names)):
               "'" + "pwd" "'" + ", " + \
               "'" + "d" + "'" + ", " + \
               str(i) + ", " + \
-              "null" + \
+              "'" + (date + datetime.timedelta(days=i)).strftime('%d-%b-%Y') + "'" + \
               ");")
     if (i%5 == 0):
         print("Insert into users values (" + \
@@ -36,14 +76,14 @@ for i in range(len(first_names)):
               "'" + "pwd" "'" + ", " + \
               "'" + "r" + "'" + ", " + \
               str(i) + ", " + \
-              "null" + \
+              "'" + (date + datetime.timedelta(days=i)).strftime('%d-%b-%Y') + "'" + \
               ");")   
     print("Insert into users values (" + \
           "'" + "p_" + first_names[i] + last_names[i] + "'" + ", " + \
           "'" + "pwd" "'" + ", " + \
           "'" + "p" + "'" + ", " + \
           str(i) + ", " + \
-          "null" + \
+          "'" + (date + datetime.timedelta(days=i)).strftime('%d-%b-%Y') + "'" \
           ");")  
     
 # family_doctor
@@ -65,10 +105,10 @@ for i in range(len(first_names)):
                   str(x) + ", " + \
                   str(0) + ", " + \
                   "'" + "MRI" + "'" + ", " + \
-                  "null"  + ", " + \
-                  "null"  + ", " + \
-                  "'" + "DEAD" + "'" + ", " + \
-                  "'" + "Doctor messed up" + "'" + \
+                  "'" + (date + datetime.timedelta(days=i*i%300+25)).strftime('%d-%b-%Y') + "'"  + ", " + \
+                  "'" + (date + datetime.timedelta(days=i*i+300+40)).strftime('%d-%b-%Y') + "'"  + ", " + \
+                  "'" + results[int((x+i)*0.75)%len(results)][0] + "'" + ", " + \
+                  "'" + results[int((x+i)*0.75)%len(results)][1] + "'" + \
                   ");")
             count += 1
             
@@ -82,9 +122,9 @@ for i in range(len(first_names)):
                 print("Insert into pacs_images values (" + \
                       str(r_count) + ", " + \
                       str(i_count) + ", " + \
-                      "null"  + ", " + \
-                      "null"  + ", " + \
-                      "null"  + \
+                      f1  + ", " + \
+                      f2  + ", " + \
+                      f3  + \
                       ");")
                 i_count += 10
-            r_count += 1
+        r_count += 1

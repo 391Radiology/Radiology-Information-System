@@ -51,7 +51,11 @@
                         header("location:account.php");
                     }
                 }
-        }
+
+                // Free the statement identifier when closing the connection
+                oci_free_statement($stid);
+                oci_close($conn);
+            }
         ?>
     </body>
 </html>

@@ -20,8 +20,6 @@
                     trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
                 }
 
-                echo "Welcome ";
-
                 //sql command
                 $sql = 'SELECT * FROM persons WHERE person_id = ' . $_SESSION["pid"] . '';
 
@@ -37,20 +35,22 @@
                     echo htmlentities($err['message']);
                 } else {
                     $person = oci_fetch_array($stid);
-                    echo '' . $person[1] . ' ' . $person[2] . ' <br/>';
+                    echo 'Welcome  '. $person[1] . ' ' . $person[2] . ' <br/>';
                     echo '' . $types[$_SESSION["type"]] . ' <br/>';
                 }
-            }
 
-            if (isset($_SESSION["usr"])) {
+                // Free the statement identifier when closing the connection
+                oci_free_statement($stid);
+                oci_close($conn);
         ?>
-            <form name="login" method="post" action="logout.php">
-                <input type="submit" name="logout" value="Logout"/>
-            </form>
-            <?php
+                <form name="login" method="post" action="logout.php">
+                    <input type="submit" name="logout" value="Logout"/>
+                </form>
+        <?php
             }
             else {
                 echo "Session not found, please login again";
+                header("refresh:3; url=login.php");
             }
         ?>
     </body>

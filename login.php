@@ -15,13 +15,10 @@
                 <?php
                 if (isset($_SESSION["Error"])) {
                     echo '' . $_SESSION["Error"] . ' <br/>';
-                    $_SESSION["Error"] = '';
+                    session_unset("Error");
                 }
                 ?>
                 <input type="submit" name="login" value="Login"/>
-            </form>
-            <form name="register" method="post" action="register.php">
-                <input type="submit" name="register" value="Register"/>
             </form>
         <?php
             }

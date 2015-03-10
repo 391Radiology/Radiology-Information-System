@@ -1,5 +1,5 @@
 <?php
-    include("PHPconnectionDB.php");
+    include("medical_info.php");
     session_start();
 ?>
 <html>
@@ -9,9 +9,9 @@
 
                 //establish types array
                 $types = array('a' => 'Admin',
-                    'd' => 'Doctor',
-                    'r' => 'Radiologist',
-                    'p' => 'Patient');
+                        'd' => 'Doctor',
+                        'r' => 'Radiologist',
+                        'p' => 'Patient');
 
                 //establish connection
                 $conn = connect();
@@ -21,7 +21,7 @@
                 }
 
                 //sql command
-                $sql = 'SELECT * FROM persons WHERE person_id = ' . $_SESSION["pid"] . '';
+                $sql = 'SELECT * FROM persons WHERE person_id = '.$_SESSION["pid"].'';
 
                 //Prepare sql using conn and returns the statement identifier
                 $stid = oci_parse($conn, $sql);
@@ -42,6 +42,9 @@
                 // Free the statement identifier when closing the connection
                 oci_free_statement($stid);
                 oci_close($conn);
+
+                if ($_SESSION["type"] == 'p') medical_info($_SESSION["pid"], "patient_id");
+                else if ($_SESSION["type"] == 'r') medical_info($_SESSION["pid"], "radiologist_id");
         ?>
                 <form name="login" method="post" action="logout.php">
                     <input type="submit" name="logout" value="Logout"/>

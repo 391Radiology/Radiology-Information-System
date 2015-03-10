@@ -23,7 +23,7 @@
 
 
                 //sql command
-                $sql = 'SELECT * FROM users WHERE user_name = \''.$_SESSION["usr"].'\' AND password = \''.$_SESSION["pwd"].'\'';
+                $sql = 'SELECT * FROM users WHERE LOWER(user_name) = \''.strtolower($_SESSION["usr"]).'\' AND password = \''.$_SESSION["pwd"].'\'';
 
                 //Prepare sql using conn and returns the statement identifier
                 $stid = oci_parse($conn, $sql );

@@ -119,6 +119,7 @@ Insert into persons values (17, 'Aoi', 'Kuneida', '17Edmonton', 'Aoi@hotmail.com
 Insert into persons values (18, 'Tatsuya', 'Shiba', '18Edmonton', 'Tatsuya@hotmail.com', '7800000000');
 Insert into persons values (19, 'Miyuki', 'Shiba', '19Edmonton', 'Miyuki@hotmail.com', '7801111111');
 Insert into persons values (20, 'Moroha', 'Haimura', '20Edmonton', 'Moroha@hotmail.com', '7802222222');
+Insert into users values ('admin', 'admin', 'a', 2, '03-Mar-2015');
 Insert into users values ('a_RaymondLieu', 'pwd', 'a', 0, '03-Mar-2015');
 Insert into users values ('d_RaymondLieu', 'pwd', 'd', 0, '03-Mar-2015');
 Insert into users values ('r_RaymondLieu', 'pwd', 'r', 0, '03-Mar-2015');

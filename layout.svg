@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="New document 1">
+   sodipodi:docname="layout.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -25,16 +25,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="350.34425"
-     inkscape:cy="552.26994"
+     inkscape:cx="307.82735"
+     inkscape:cy="534.29959"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:snap-object-midpoints="true"
-     inkscape:window-width="1280"
-     inkscape:window-height="930"
+     inkscape:window-width="1680"
+     inkscape:window-height="956"
      inkscape:window-x="0"
      inkscape:window-y="31"
      inkscape:window-maximized="1" />
@@ -46,7 +46,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -59,190 +59,176 @@
        id="rect2985"
        width="200"
        height="910.40192"
-       x="34.285713"
-       y="133.79076" />
+       x="-724.28571"
+       y="129.50504" />
     <rect
        style="fill:#ffff00;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        id="rect2987"
        width="165.71428"
        height="105.71429"
-       x="48.57143"
-       y="243.79076" />
+       x="284.28574"
+       y="222.3622" />
     <rect
        style="fill:#ff0000;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        id="rect2989"
        width="134.28572"
        height="114.28571"
-       x="64.285713"
-       y="512.36218" />
+       x="285.71429"
+       y="676.64789" />
     <rect
-       style="fill:#ff0000;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#ff7f2a;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        id="rect2991"
        width="137.14285"
        height="94.285713"
-       x="64.285713"
-       y="649.50507" />
+       x="-692.85712"
+       y="537.56317" />
     <rect
-       style="fill:#ff0000"
+       style="fill:#ff7f2a"
        id="rect2993"
        width="157.14285"
        height="117.14286"
-       x="52.857143"
-       y="783.79077" />
-    <rect
-       style="fill:#000000"
-       id="rect2995"
-       width="491.42856"
-       height="385.71429"
-       x="244.28572"
-       y="133.79076" />
-    <rect
-       style="fill:#000000"
-       id="rect2997"
-       width="491.42859"
-       height="518.57141"
-       x="244.28572"
-       y="522.36218" />
+       x="-705.71423"
+       y="352.36215" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 114.28571,303.79075 -5.71428,-2.85714"
+       d="m 114.28571,302.36218 -5.71428,-2.85714"
        id="path2999"
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
-       x="47.142857"
-       y="300.93359"
+       x="281.42859"
+       y="283.79077"
        id="text3001"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3003"
-         x="47.142857"
-         y="300.93359"
+         x="281.42859"
+         y="283.79077"
          style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'">Account Info</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
-       x="35.714287"
-       y="590.93365"
+       x="270"
+       y="745.21936"
        id="text3005"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3007"
-         x="35.714287"
-         y="590.93365">Patient Info</tspan></text>
+         x="270"
+         y="745.21936">Patient Info</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
-       x="44.285713"
-       y="703.79071"
+       x="-721.42859"
+       y="593.79071"
        id="text3009"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3011"
-         x="44.285713"
-         y="703.79071">Doctor Info</tspan></text>
+         x="-721.42859"
+         y="593.79071">Doctor Info</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
-       x="-21.428576"
-       y="839.505"
+       x="-780"
+       y="408.07639"
        id="text3013"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3015"
-         x="-21.428576"
-         y="839.505">Not real doctor info</tspan></text>
+         x="-780"
+         y="408.07639">Not real doctor info</tspan></text>
     <rect
        style="fill:#00ff00"
        id="rect3017"
        width="150"
        height="95.714287"
-       x="55.714287"
-       y="376.64789" />
+       x="287.14288"
+       y="436.64786" />
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
-       x="14.285714"
-       y="435.21933"
+       x="234.28574"
+       y="489.50504"
        id="text3019"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3021"
-         x="14.285714"
-         y="435.21933">Medical Record</tspan></text>
+         x="234.28574"
+         y="489.50504">Medical Record</tspan></text>
     <rect
        style="fill:#ffff00"
        id="rect3023"
        width="34.285713"
        height="32.85714"
        x="-474.28571"
-       y="152.36218" />
+       y="150.93361" />
     <rect
        style="fill:#00ff00"
        id="rect3025"
        width="30"
        height="31.428572"
-       x="-474.28574"
-       y="223.79076" />
+       x="-477.14288"
+       y="213.79076" />
     <rect
        style="fill:#ff0000"
        id="rect3027"
        width="37.142849"
        height="31.428579"
-       x="-472.85715"
-       y="92.362167" />
+       x="-664.28564"
+       y="39.505005" />
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
        x="-425.71429"
-       y="179.50504"
+       y="178.07646"
        id="text3033"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3035"
          x="-425.71429"
-         y="179.50504">Everyone</tspan></text>
+         y="178.07646">Everyone</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
-       x="-424.28571"
-       y="250.93362"
+       x="-427.14285"
+       y="240.93362"
        id="text3037"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3039"
-         x="-424.28571"
-         y="250.93362">Patient Only</tspan></text>
+         x="-427.14285"
+         y="240.93362">Patient Only</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
-       x="-418.57141"
-       y="118.07645"
+       x="-627.14282"
+       y="70.933586"
        id="text3041"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3043"
-         x="-418.57141"
-         y="118.07645">No patient/not real doctor </tspan></text>
+         x="-627.14282"
+         y="70.933586">No patient/not real doctor/ </tspan></text>
     <rect
-       style="fill:#ff0000"
+       style="fill:#ff7f2a"
        id="rect3047"
        width="154.28572"
        height="94.285713"
-       x="54.285713"
-       y="932.36218" />
+       x="-701.42859"
+       y="678.07648" />
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
-       x="-11.428569"
-       y="990.93359"
+       x="-767.14288"
+       y="736.64789"
        id="text3051"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3053"
-         x="-11.428569"
-         y="990.93359">Manage Accounts</tspan></text>
+         x="-767.14288"
+         y="736.64789">Manage Accounts</tspan></text>
     <rect
        style="fill:#0000ff"
        id="rect3055"
@@ -261,14 +247,14 @@
        xml:space="preserve"
        style="font-size:39.19690704px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
        x="446.10806"
-       y="56.91045"
+       y="55.510559"
        id="text3059"
        sodipodi:linespacing="125%"
        transform="scale(0.97992266,1.0204887)"><tspan
          sodipodi:role="line"
          id="tspan3061"
          x="446.10806"
-         y="56.91045">User Name</tspan></text>
+         y="55.510559">User Name</tspan></text>
     <flowRoot
        xml:space="preserve"
        id="flowRoot3063"
@@ -280,7 +266,7 @@
            x="631.42859"
            y="26.647896"
            style="fill:#f9f9f9" /></flowRegion><flowPara
-         id="flowPara3069"></flowPara></flowRoot>    <rect
+         id="flowPara3069" /></flowRoot>    <rect
        style="fill:#f9f9f9"
        id="rect3071"
        width="92.85714"
@@ -291,32 +277,80 @@
        xml:space="preserve"
        style="font-size:31.98394966px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
        x="656.89496"
-       y="47.254364"
+       y="45.890083"
        id="text3073"
        sodipodi:linespacing="125%"
-       transform="scale(0.9549962,1.0471246)"><tspan
+       transform="scale(0.95499619,1.0471246)"><tspan
          sodipodi:role="line"
          id="tspan3075"
          x="656.89496"
-         y="47.254364">Logout</tspan></text>
+         y="45.890083">Logout</tspan></text>
     <rect
        style="fill:#f9f9f9"
        id="rect3077"
        width="390"
        height="78.571426"
        x="27.142857"
-       y="29.505039" />
+       y="28.076468" />
+    <rect
+       y="379.50507"
+       x="144.28571"
+       height="11.428572"
+       width="445.71429"
+       id="rect3125"
+       style="fill:#1a1a1a" />
+    <rect
+       y="618.07648"
+       x="140"
+       height="11.428572"
+       width="445.71429"
+       id="rect3125-6"
+       style="fill:#1a1a1a" />
+    <rect
+       style="fill:#ff7f2a"
+       id="rect3155"
+       width="40"
+       height="42.857143"
+       x="-471.42856"
+       y="285.21933" />
     <text
        xml:space="preserve"
-       style="font-size:25.58522415px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
-       x="36.395103"
-       y="50.563278"
-       id="text3079"
-       sodipodi:linespacing="125%"
-       transform="scale(0.91063261,1.0981377)"><tspan
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
+       x="-397.14285"
+       y="315.21933"
+       id="text3157"
+       sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         x="36.395103"
-         y="50.563278"
-         id="tspan3083">RIS - retarded Instite of slavery</tspan></text>
+         id="tspan3159"
+         x="-397.14285"
+         y="315.21933">Admin Only</tspan></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3161"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Times New Roman;font-style:normal;font-weight:normal;font-size:40px;line-height:125%;letter-spacing:0px;word-spacing:0px;-inkscape-font-specification:'Times New Roman,';font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr"><flowRegion
+         id="flowRegion3163"><rect
+           id="rect3165"
+           width="1318.5714"
+           height="780"
+           x="-501.42856"
+           y="52.362183" /></flowRegion><flowPara
+         id="flowPara3167"></flowPara></flowRoot>    <rect
+       style="fill:#ff7f2a"
+       id="rect3169"
+       width="325.71429"
+       height="180"
+       x="962.85712"
+       y="89.505043" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman,'"
+       x="1020"
+       y="170.93361"
+       id="text3171"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3173"
+         x="1020"
+         y="170.93361">Sensitive data</tspan></text>
   </g>
 </svg>

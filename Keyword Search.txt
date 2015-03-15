@@ -1,0 +1,30 @@
+<?php
+    include("PHPconnectionDB.php");
+    //include("medical_info.php");
+
+    function search_keyword($pfname, $plname,$pid,$rid, $did, $keyWord){
+	 
+        //establish connection
+        $conn = connect();
+        if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
+	
+	//sql command
+	$sql = 'SELECT * FROM radiology_record WHERE doctor_id = '.$did;
+	if($pid){
+		$sql = ''.$sql.'AND patient_id = '.$pid;
+	}
+
+	if($plname and !$pfname){
+		$sql = 'SELECT first_name, last_name FROM family_doctor f, persons p WHERE f.doctor_id = '.$did.'AND p.person_id = f.patient_id AND 			p.last_name = '.$plname;
+	}
+
+	if($pfname and !$plname){
+		$sql = 'SELECT first_name, last_name FROM family_doctor f, persons p WHERE f.doctor_id = '.$did.'AND p.person_id = f.patient_id AND 			p.first_name = '.$pfname;
+	}
+
+	if($plname and $plname){
+		$sql = 'SELECT first_name, last_name FROM family_doctor f, persons p WHERE f.doctor_id = '.$did.'AND p.person_id = f.patient_id AND 			p.first_name = '.$pfname.'AND p.last_name ='.$plname;
+	}

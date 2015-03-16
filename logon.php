@@ -43,7 +43,7 @@
                     if (!$account) {
                     		session_unset("usr");
                     		session_unset("pwd");
-                        $_SESSION["Error"] = "Invalid username/password, please try again";
+                        $_SESSION["Error"] = "Invalid username/password, please try again :(";
                         header("location:login.php");
                     } else {
                         $_SESSION["type"] = $account[2];

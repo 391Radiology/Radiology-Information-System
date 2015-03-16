@@ -9,7 +9,7 @@
         $types = array('p' => 'Radiologist: ',
                     'r' => 'Patient: ');
         $index = array('p' => 3, 'r' => 1);
-        $datetypes = array(0 => "prescribing_date", 1 => "test_date");
+        $datetypes = array(0 => "prescribing_date", 1 => "test_date", 2 => "hi");
 
         //establish connection
         $conn = connect();

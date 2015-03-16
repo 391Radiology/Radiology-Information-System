@@ -82,7 +82,7 @@
                         if ($_SESSION["type"] == 'p' or $_SESSION["type"] == 'r') {
                             medical_info($_SESSION["pid"], $_SESSION["type"], $_POST['sdate'], $_POST['edate'], $_POST['datetype']);
                         } else {
-                            echo "Work on dis desu :3";
+                            search_keyword('Omar', null, null, null, null, null);
                         }
                     }
                 ?>

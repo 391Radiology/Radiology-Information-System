@@ -1,6 +1,5 @@
 <?php
-    include("PHPconnectionDB.php");
-    //include("medical_info.php");
+    include("medical_info.php");
 
     function search_keyword($pfname, $plname,$pid,$rid, $did, $keyWord){
 	 

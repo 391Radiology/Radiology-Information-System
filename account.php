@@ -1,5 +1,5 @@
 <?php
-    include("medical_info.php");
+    include("keyword_search.php");
     session_start();
 ?>
 

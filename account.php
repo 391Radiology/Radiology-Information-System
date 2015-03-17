@@ -52,12 +52,18 @@
                                         echo 'value=', $_POST['pid'];
                                     }
                                 ?> name="pid"/>
-                            <input type="number" placeholder="Radiologist ID"
+                            <input type="text" placeholder="First Name"
                                 <?php
-                                    if (isset($_POST['rid']) and is_numeric($_POST['rid'])) {
-                                        echo 'value=', $_POST['rid'];
+                                    if (isset($_POST['pfname']) and $_POST['pfname']) {
+                                        echo 'value=', $_POST['pfname'];
                                     }
-                                ?> name="rid"/>
+                                ?> name="pfname"/>
+                            <input type="text" placeholder="Last Name"
+                                <?php
+                                    if (isset($_POST['plname']) and $_POST['plname']) {
+                                        echo 'value=', $_POST['plname'];
+                                    }
+                                ?> name="plname"/>
                         <?php
                             }
                         ?>
@@ -84,7 +90,8 @@
                         if ($_SESSION["type"] == 'p' or $_SESSION["type"] == 'r') {
                             medical_info($_SESSION["pid"], $_SESSION["type"], $_POST['sdate'], $_POST['edate'], $_POST['datetype']);
                         } else {
-                            search_keyword($_SESSION["pid"], $_SESSION["type"], null,null,$_POST['pid'],null,$_POST['sdate'], $_POST['edate'], $_POST['datetype']);
+                            search_keyword($_SESSION["pid"], $_SESSION["type"], $_POST['pfname'], $_POST['plname'], 
+                            					$_POST['pid'], null, $_POST['sdate'], $_POST['edate'], $_POST['datetype']);
                         }
                     }
                 ?>

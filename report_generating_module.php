@@ -1,5 +1,4 @@
 <?php
- 	include ("PHPconnectionDB.php");
  	
  	$conn=connect();
  	if(isset($_POST['validate'])){        	

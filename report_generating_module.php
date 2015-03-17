@@ -13,7 +13,7 @@
 	 	$res=oci_execute($stid);
 	 	while (($row = oci_fetch_array($stid, OCI_ASSOC))) {
 			foreach ($row as $item) {
-				echo $item.' &nbsp;';
+				echo $item.;
 			}
 			//echo 'Name: '.$row[1].$row[2].'Address'.$row[3].'Phone:'.$row[4]."test date:".row[5].
 			}

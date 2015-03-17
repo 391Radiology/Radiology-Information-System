@@ -84,7 +84,7 @@
                         if ($_SESSION["type"] == 'p' or $_SESSION["type"] == 'r') {
                             medical_info($_SESSION["pid"], $_SESSION["type"], $_POST['sdate'], $_POST['edate'], $_POST['datetype']);
                         } else {
-                            search_keyword($_SESSION["pid"], $_SESSION["type"], null,null,$_POST['pid'],null,$_POST['sdate'], $_POST['edate'], $_POST['datetype']);
+                            search_keyword($_SESSION["pid"], $_SESSION["type"], null,null,$_POST['pid'],$_POST['sdate'], $_POST['edate'], $_POST['datetype']);
                         }
                     }
                 ?>

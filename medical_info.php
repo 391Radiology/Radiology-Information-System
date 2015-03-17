@@ -25,7 +25,7 @@
         $sql = 'SELECT * FROM radiology_record WHERE '.$colname[$colid].' = '.$pid.'';
         if ($sdate) $sql = ''.$sql.' AND '.$datetypes[$datetype].' >= \''.date_format($sdate,"j-M-Y").'\'';
         if ($edate) $sql = ''.$sql.' AND '.$datetypes[$datetype].' <= \''.date_format($edate,"j-M-Y").'\'';
-
+			echo $sql;
         //Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql);
 

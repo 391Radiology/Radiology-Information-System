@@ -1,6 +1,3 @@
-
-
-
 <?php
  	include ("PHPconnectionDB.php");
  	

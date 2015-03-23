@@ -2,7 +2,7 @@
   
     function search_keyword($pid,$type,$pfname, $plname,$sid, $keyWord,$sdate, $edate, $datetype){
     	//get patient info
-	 	  if ($sid){
+	 	  if ($sid != null){
 				medical_info($sid, 'p', $sdate, $edate, $datetype); 	
 				die();
         	}
@@ -23,10 +23,11 @@
 				$sql = ''.$sql.' AND p.first_name  = \''.$pfname.'\'';
 				}
 			if ($plname){
-				$sql = ''.$sql.' AND p.first_name  = \''.$plname.'\'';
+				$sql = ''.$sql.' AND p.last_name  = \''.$plname.'\'';
 				}
 			if ($sdate) $sql = ''.$sql.' AND '.$datetypes[$datetype].' >= \''.date_format($sdate,"j-M-Y").'\'';	
 			if ($edate) $sql = ''.$sql.' AND '.$datetypes[$datetype].' <= \''.date_format($edate,"j-M-Y").'\'';
-        echo 'tetettetetet'.$sql;
+			
+			//implement KEYWORD
     }
 ?>

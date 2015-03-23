@@ -1,5 +1,5 @@
 <?php
-    include("PHPconnectionDB.php");
+    //include("PHPconnectionDB.php");
 
     function medical_info($pid, $colid, $sdate, $edate, $datetype) {
         //establish arrays

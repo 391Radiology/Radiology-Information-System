@@ -44,27 +44,57 @@
                 ?>
                     <form name="search" method="post" action="account.php">
                         <?php
-                        if ($_SESSION["type"] == 'a' or $_SESSION["type"] == 'd') {
+                        if ($_SESSION["type"] != 'p') {
                             ?>
-                            <input type="number" placeholder="Patient ID"
-                                <?php
-                                    if (isset($_POST['pid']) and is_numeric($_POST['pid'])) {
-                                        echo 'value=', $_POST['pid'];
-                                    }
-                                ?> name="pid"/>
-                            <input type="text" placeholder="First Name"
-                                <?php
-                                    if (isset($_POST['pfname']) and $_POST['pfname']) {
-                                        echo 'value=', $_POST['pfname'];
-                                    }
-                                ?> name="pfname"/>
-                            <input type="text" placeholder="Last Name"
-                                <?php
-                                    if (isset($_POST['plname']) and $_POST['plname']) {
-                                        echo 'value=', $_POST['plname'];
-                                    }
-                                ?> name="plname"/>
+                            Search by: 
+									 <input type="radio" name="searchtype" value=0
+                            	<?php if(!isset($_POST['searchtype']) or $_POST['searchtype'] == 0) echo 'checked'; ?>/> Keyword
+                        	 <input type="radio" name="searchtype" value=1
+                            	<?php if(isset($_POST['searchtype']) and $_POST['searchtype'] == 1) echo 'checked'; ?>/> Person 
+                        	
                         <?php
+                            } 
+                            ?>
+                               Date Type: 
+                            <input type="radio" name="datetype" value=0
+                            <?php if(!isset($_POST['datetype']) or $_POST['datetype'] == 0) echo 'checked'; ?>/> Prescription Date
+                        <input type="radio" name="datetype" value=1
+                            <?php if(isset($_POST['datetype']) and $_POST['datetype'] == 1) echo 'checked'; ?>/> Test Date   
+                        <input type="submit" name="search" value="Search"/> <br/>
+                        <?php
+            						if ($_SESSION["type"] != 'p') {
+                            		if(!isset($_POST['searchtype']) or $_POST['searchtype'] == 0) {
+                    				?>
+                            		<input type="text" placeholder="Keyword"
+                                		<?php
+                                    	if (isset($_POST['keywords']) and $_POST['keywords']) {
+                                        	echo 'value=', $_POST['keywords'];
+                                    	}
+                                	?> name="keywords"/>
+                            		
+                              <?php 
+                                	} else {
+                    				?>
+                            		<input type="number" placeholder="Patient ID"
+                                		<?php
+                                    	if (isset($_POST['pid']) and is_numeric($_POST['pid'])) {
+                                        	echo 'value=', $_POST['pid'];
+                                    	}
+                                	?> name="pid"/>
+                            		<input type="text" placeholder="First Name"
+                                		<?php
+                                    	if (isset($_POST['pfname']) and $_POST['pfname']) {
+                                       	 echo 'value=', $_POST['pfname'];
+                                    	}
+                                	?> name="pfname"/>
+                            		<input type="text" placeholder="Last Name"
+                                		<?php
+                                    	if (isset($_POST['plname']) and $_POST['plname']) {
+                                       	 echo 'value=', $_POST['plname'];
+                                    	}	
+                                	?> name="plname"/>
+                              <?php 
+                                	}
                             }
                         ?>
                         Start Date : <input type="date" placeholder="yyyy-mm-dd" maxlength=10
@@ -79,11 +109,7 @@
                                     echo 'value=', $_POST['edate'];
                                 }
                             ?> name="edate"/><br/>
-                        <input type="radio" name="datetype" value=0
-                            <?php if(!isset($_POST['datetype']) or $_POST['datetype'] == 0) echo 'checked'; ?>/> Prescription Date
-                        <input type="radio" name="datetype" value=1
-                            <?php if(isset($_POST['datetype']) and $_POST['datetype'] == 1) echo 'checked'; ?>/> Test Date
-                        <input type="submit" name="search" value="Search"/>
+                        
                     </form>
                 <?php
                     if (isset($_POST['search'])) {
@@ -94,7 +120,13 @@
                             					$_POST['pid'], null, $_POST['sdate'], $_POST['edate'], $_POST['datetype']);
                         }
                     }
+                    if (isset($_POST['test'])) {
+                        
+                    }
                 ?>
+                	  <form name="test" method="post">
+                        <input type="submit" name="test" value="Test"/>
+                    </form>
                     <form name="logout" method="post" action="logout.php">
                         <input type="submit" name="logout" value="Logout"/>
                     </form>

@@ -7,9 +7,11 @@
    		} 	
 	 	//sql 
 	 	$date = DateTime::createFromFormat('Y-M-J', $date);
-		$sql = 'SELECT first_name, last_name, address, phone, test_date,diagnosis 
-			FROM persons p, radiology_record r 
-			WHERE p.person_id = r.patient_id AND r.diagnosis = '.$diagnosis.' AND r.test_date >'.date_format($date,"J-M-Y").' GROUP BY first_name, last_name, address, phone, diagnosis';
+		$sql = 'SELECT';
+		$sql.=' first_name, last_name, address, phone, test_date,diagnosis';
+		$sql.='FROM persons p, radiology_record r ';
+		$sql.='WHERE p.person_id = r.patient_id AND r.diagnosis = '.$diagnosis.' AND r.test_date >'.date_format($date,"J-M-Y");
+		$sql.= 'GROUP BY first_name, last_name, address, phone, diagnosis';
 	 	$stid = oci_parse($conn, $sql );
 	 	$res=oci_execute($stid);
 	 	while (($row = oci_fetch_array($stid, OCI_ASSOC))) {

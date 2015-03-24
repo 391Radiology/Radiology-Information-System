@@ -21,9 +21,9 @@
 						OR contains(description, %s, 4) > 0
 						';
 			
-			if ($sdate) $sql =' '.$sql.' AND  >= \''.date_format($sdate,"j-M-Y").'\'';		
+			if ($sdate) $sql =' '.$sql.' AND test_date >= \''.date_format($sdate,"j-M-Y").'\'';		
 			
-			if ($edate) $sql = ' '.$sql.' AND <= \''.date_format($edate,"j-M-Y").'\'';
+			if ($edate) $sql = ' '.$sql.' AND test_date <= \''.date_format($edate,"j-M-Y").'\'';
 			
 			$rest_of_query = ' ORDER BY (6*(score(1)+score(2))+3*score(3)+score(4))';
 			$sql2 = sprintf($sql, $keyWord,$keyWord,$keyWord,$keyWord);

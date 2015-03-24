@@ -74,6 +74,7 @@
 			$search = implode(" ", $_GET["key"]);
 			if ($search) { 
 				echo 'Search results for: '.$search.' <br>';
+				search_keyword($search, $_GET["sdate"],$_GET["edate"]);
 			} else {
 				?>
 					<div style="color:red;">

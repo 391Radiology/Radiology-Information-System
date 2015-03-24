@@ -12,23 +12,43 @@
         	$edate = DateTime::createFromFormat('Y-m-j', $edate);
 					
 			//implement KEYWORD /compsci/webdocs/zioueche/web_doc
-			$sql = 'SELECT 6*(score(1)+score(2))+3*score(3)+score(4) as rank
+			$sql = 'SELECT 6*(score(1)+score(2))+3*score(3)+score(4) as rank, p.first_name, p.last_name, test_date, test_type
 						FROM radiology_record r, persons p 
 						WHERE p.person_id = r.patient_id 
-						AND contains(first_name, %s, 1)>0 
-						OR contains(last_name, %s, 2)>0 
-						OR contains(diagnosis, %s, 3) > 0 
-						OR contains(description, %s, 4) > 0
+						AND contains(first_name, \'%s\', 1)>0 
+						OR contains(last_name, \'%s\', 2) > 0 
+						OR contains(diagnosis, \'%s\', 3) > 0 
+						OR contains(description, \'%s\', 4) > 0
 						';
 			
 			if ($sdate) $sql =' '.$sql.' AND test_date >= \''.date_format($sdate,"j-M-Y").'\'';		
-			
 			if ($edate) $sql = ' '.$sql.' AND test_date <= \''.date_format($edate,"j-M-Y").'\'';
 			
 			$rest_of_query = ' ORDER BY (6*(score(1)+score(2))+3*score(3)+score(4))';
 			$sql2 = sprintf($sql, $keyWord,$keyWord,$keyWord,$keyWord);
-			$sql2 = $sql2.	$rest_of_query;		
+			$sql = $sql2.	$rest_of_query;		
 			//$sql2 = sprintf($sql, $keyWord);	
-			echo $sql2;
+			echo $sql;
+			echo '  ';
+			
+			//prep connection
+			$stid = oci_parse($conn, $sql);
+
+        //Execute a statement returned from oci_parse()
+        $res = oci_execute($stid);
+
+        //if error, retrieve the error using the oci_error() function & output an error message
+        if (!$res) {
+            $err = oci_error($stid);
+            echo htmlentities($err['message']);
+        } else {
+            while ($record = oci_fetch_array($stid)) {
+            	 echo "rank          Name", '<br/>';
+                echo $record[0], $record[1], $record[2], $record[3],$record[4] , '<br/>';
+            }
+            }
+        // Free the statement identifier when closing the connection
+        oci_free_statement($stid);
+        oci_close($conn);
     }
 ?>

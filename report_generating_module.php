@@ -21,6 +21,8 @@
 			//echo 'Name: '.$row[1].$row[2].'Address'.$row[3].'Phone:'.$row[4]."test date:".row[5].
 			}
 		echo '<br/>';
+		oci_free_statement($stid);
+		oci_close($conn);
 	 	}
  	}
 ?>

@@ -15,11 +15,13 @@
 	 	$stid = oci_parse($conn, $sql );
 	 	$res=oci_execute($stid);
 	 	while (($row = oci_fetch_array($stid, OCI_ASSOC))) {
+	 		echo '<tr>';
 			foreach ($row as $item) {
-
-				echo $item;
+				
+				echo '<td> $item </td>';
 
 			}
+			echo '<tr>';
 			//echo 'Name: '.$row[1].$row[2].'Address'.$row[3].'Phone:'.$row[4]."test date:".row[5].
 			}
 		echo '<br/>';

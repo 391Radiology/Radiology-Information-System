@@ -19,12 +19,14 @@
 			if ($edate) $sql = ''.$sql.' AND '.$datetypes[$datetype].' <= \''.date_format($edate,"j-M-Y").'\'';
 			
 			//implement KEYWORD /compsci/webdocs/zioueche/web_docs
-
+			$search_parameter = $keyWord;
 			$sql = 'SELECT 6*(score(1)+score(2))+3*score(3)+score(4) as rank
 			FROM radiology_record r, persons p 
-			WHERE p.person_id = r.patient_id AND contains(first_name,  \''$keyword.'\', 1)>0 OR contains(last_name,  \''.$keyword.'\', 2)>0 OR 			   contains(diagnosis, \''.$keyword.'\' 3) > 0 OR contains(description,  '\''.$keyword.'\', 4) > 0 
+			WHERE p.person_id = r.patient_id AND contains(first_name,  %s, 1)>0 OR contains(last_name,  %s, 2)>0 OR contains(diagnosis, %s, 3) > 0 
+			OR contains(description,  %s, 4) > 0 
 			ORDER BY (6*(score(1)+score(2))+3*score(3)+score(4))';
-			echo $sql
+			$sql = sprintf($sql, $search_parameter);			
+			echo $sql;
     }
 ?>
 

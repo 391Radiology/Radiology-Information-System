@@ -161,7 +161,9 @@
 <script>
 	// Adds another text input into the dynamic list of keywords
 	function addKeyword() {
-		document.getElementById('keywordsList').innerHTML += '<input type="text" name="key[]" style="margin-bottom:1px; height:25px; width:180px;"/><br>';
+		var newdiv = document.createElement('div');
+		newdiv.innerHTML = '<input type="text" name="key[]" style="margin-bottom:1px; height:25px; width:180px;"/><br>';
+		document.getElementById('keywordsList').appendChild(newdiv);
 	}			
 
 	// Switches mode value

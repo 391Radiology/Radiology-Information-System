@@ -29,7 +29,7 @@
             echo htmlentities($err['message']);
         } else {
             // No error
-            // Fetch accounts matching usr and pwd (should be unique)
+            // Fetch account matching usr and pwd (should be unique)
             $account = oci_fetch_array($stid);
 
             if (!$account) {
@@ -37,8 +37,7 @@
                 $_SESSION["error"] = "Invalid username/password";
             } else {
                 // Account was found, save account id and type in session
-                $_SESSION["type"] = $account[2];
-                $_SESSION["pid"] = $account[3];
+                $_SESSION["usr"] = $account[0];
             }
         }
 
@@ -47,27 +46,29 @@
         oci_close($conn);
 
         // If login is successful, move to account page
-        if (isset($_SESSION["pid"])) header("location:account.php?mode=account");
+        if (isset($_SESSION["usr"])) header("location:account.php?mode=account");
     }
 
     // Creates form for logging in
     function loginForm() {
     ?>
-        <h1 style="margin-top: 200px; text-align:center;">RIS Login</h1>
+        <h1 style="margin-top: 200px; text-align:center;">
+            RIS Login
+        </h1>
 
         <form name="login" method="post" style="margin-top:10px; text-align:center;">
-            <input type="text" placeholder="Username" maxlength="24" name="usr" style="height:25px; width:180px;"/><br/>
-            <input type="password" placeholder="Password" maxlength="24" name="pwd" style="margin-top:1px; height:25px; width:180px;"/><br/>
+            <input type="text" placeholder="Username" maxlength="24" name="usr" style="height:25px; width:180px;"><br>
+            <input type="password" placeholder="Password" maxlength="24" name="pwd" style="margin-top:1px; height:25px; width:180px;"><br>
             <div style="color:red;">
         <?php
             if (isset($_SESSION["error"])) {
-                echo '' . $_SESSION["error"] . ' <br/>';
+                echo '' . $_SESSION["error"] . '<br>';
                 session_unset("error");
             }
         ?>
             </div>
 
-            <input type="submit" name="login" value="Login" style="margin-top:10px; height:25px; width:180px;"/>
+            <input type="submit" name="login" value="Login" style="margin-top:10px; height:25px; width:180px;">
         </form>
     <?php
     }
@@ -76,18 +77,15 @@
 <html>
     <TITLE>RIS Login</TITLE>
     <!-- Not logged in will show background -->
-    <body style=<?php echo (!isset($_SESSION["pid"]) ? "\"background-image:url(bg1.jpg); -background-color:#cccccc; background-size:100% 100%\"": "\"\"" ); ?>>
+    <body style=<?php echo (!isset($_SESSION["usr"]) ? "\"background-image:url(bg1.jpg); -background-color:#cccccc; background-size:100% 100%\"": "\"\"" ); ?>>
             <?php
-                if (!isset($_SESSION["pid"])) {
+                if (!isset($_SESSION["usr"])) {
                     // Not logged in
                     // Try to login if previous request was made
                     if (isset($_POST["login"])) loginAttempt();
 
                     // Create login form (No previous login request or login request failed)
                     loginForm();
-
-
-
                     
                 } else {
                     // Already logged in, redirect to account page

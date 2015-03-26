@@ -6,7 +6,7 @@
 <html>
 	<body>
 		<?php
-				if (isset($_SESSION["pid"])) {
+				if (isset($_SESSION["usr"])) {
 					// Logged in
 					// Establish modes array
 					$modes = array('account', 'search');
@@ -17,7 +17,7 @@
 						switchForm();
 						
 						// Create forms based on mode
-						if ($_GET["mode"] == "account") userForm($_SESSION['pid']);
+						if ($_GET["mode"] == "account") userForm($_SESSION["usr"]);
 						else if ($_GET["mode"] == "search") searchForm();
 
 						// Create logout form

@@ -1,7 +1,14 @@
 <?php
+	session_start();
 	include_once("PHPconnectionDB.php");
 	include_once("key_search.php");
 
+	// Establish global types array
+	$types = array('a' => 'Admin',
+			'd' => 'Doctor',
+			'r' => 'Radiologist',
+			'p' => 'Patient');
+	
 	// Creates form for switching the mode 
 	function switchForm() {
 	?>
@@ -9,39 +16,36 @@
 			<input type="hidden" name="mode" id="mode">
     		<input type="submit" value="Account Info" onclick="switchMode('account')">	
     		<input type="submit" value="Search" onclick="switchMode('search')">	
+    		<input type="submit" value="Manage Users" onclick="switchMode('manage')">	
+    		<input type="submit" value="Generate Report" onclick="switchMode('generate')">	
+    		<input type="submit" value="Data Analysis" onclick="switchMode('analysis')">	
 		</form>
 	<?php
 	}
 
 	// Creates forms for the account and person info of specified username which can be editted (called when mode == account)
-    function userForm($usr) {
-		// Establish types array
-		$types = array('a' => 'Admin',
-				'd' => 'Doctor',
-				'r' => 'Radiologist',
-				'p' => 'Patient');
-								
+    function userForm($usr, $pid) {	
         // Establish connection
         $conn = connect();
         if (!$conn) {
             $e = oci_error();
             trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
         }
-        
-        // Try to update info if previous request was made
-        if (isset($_POST["saveInfo"]) or isset($_POST["savePwd"])) updateAccount();
+
+   		// Try to update info if previous request was made
+    	if (isset($_POST["saveInfo"])) updateInfo($usr, $pid);
+		else if (isset($_POST["savePwd"])) updatePwd($usr);
 
         // Sql command
-        $sql = 'SELECT p.person_id, u.class, p.first_name, p.last_name, p.address, p.phone, p.email  
+        $sql = 'SELECT u.user_name, p.person_id, u.class, p.first_name, p.last_name, p.address, p.phone, p.email  
         		FROM users u, persons p 
-        		WHERE u.user_name = \''.$usr.'\' AND p.person_id = u.person_id';
+        		WHERE u.user_name = \''.$usr.'\' AND p.person_id = '.$pid.'';
 
         // Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql);
 
         // Execute a statement returned from oci_parse()
         $res = oci_execute($stid);
-
 
         if (!$res) {
         	// Error, retrieve the error using the oci_error() function & output an error message
@@ -52,56 +56,93 @@
         	// Fetch info matching usr (should be unique)
         	$info = oci_fetch_array($stid);
 
-		?>
-			<h1>
-         	   Account Info
-        	</h1>
+        	// Retrieve types
+        	global $types;
 
-        	<!-- -->
-			<form name="info" method="post" action="account.php?mode=account">
-				<!-- Create a list for account types -->
-				Account Type : <input list="types" name="type" <?php echo 'value='.$types[$info[1]].''; ?>
-										style="margin-top:10px; height:25px; width:180px;" autocomplete="off"><br>
+        	if ($info) {
+			?>
+				<h1>
+	         	   Account Info
+	        	</h1>
 
-				<!-- Populate list with all account types -->
-				<datalist id="types">
-				<?php
-					foreach ($types as $type) {
+	        	<!-- -->
+				<form name="info" method="post" action="account.php?mode=account">
+					<!-- Create a selection for account types -->
+					Account Type : 
+					<select name = "class">
+	    			<?php
+						foreach ($types as $key => $type) {
+							// Add every type from types into the selection
+						?>
+							<option <?php echo 'value='.$key.' '.($key == $info['CLASS'] ? 'selected': '').''; ?>><?php echo ''.$type.''; ?></option>
+						<?php
+						}
 					?>
-						<option <?php echo 'value='.$type.''; ?>>
-					<?php
-					}
-				?>
-				</datalist>
-				
-				<!-- Basic personal information -->
-				First Name : <input type="text" name="fname" <?php echo 'value='.$info[2].''; ?>
-									style="margin-top:10px; height:25px; width:180px;"><br>
-				Last Name : <input type="text" name="lname" <?php echo 'value='.$info[3].''; ?>
-									style="margin-top:10px; height:25px; width:180px;"><br>
-				Address : <input type="text" name="address" <?php echo 'value='.$info[4].''; ?>
-									style="margin-top:10px; height:25px; width:180px;"><br>
-				Phone : <input type="text" name="phone" <?php echo 'value='.$info[5].''; ?>
-								style="margin-top:10px; height:25px; width:180px;"><br>
-				Email : <input type="text" name="email" <?php echo 'value='.$info[6].''; ?>
-								style="margin-top:10px; height:25px; width:180px;"><br>
+	  				</select><br>
 
-				<input type="submit" name="saveInfo" value="Save" style="margin-top:10px; height:25px; width:180px;">
- 			</form>
+					<!-- Basic personal information -->
+					First Name : <input type="text" name="fname" placeholder="First Name" maxlength="24"
+										<?php if(isset($info['FIRST_NAME'])) echo 'value='.$info['FIRST_NAME'].''; ?>
+										style="margin-top:10px; height:25px; width:180px;" required><br>
+					Last Name : <input type="text" name="lname" placeholder="Last Name" maxlength="24"
+										<?php if(isset($info['LAST_NAME'])) echo 'value='.$info['LAST_NAME'].''; ?>
+										style="margin-top:10px; height:25px; width:180px;" required><br>
+					Address : <input type="text" name="address" placeholder="Address" maxlength="128"
+										<?php if(isset($info['ADDRESS'])) echo 'value='.$info['ADDRESS'].''; ?>
+										style="margin-top:10px; height:25px; width:180px;"><br>
+					Phone Number : <input type="text" name="phone" placeholder="10 digit phone number" pattern="[0-9]{10}" 
+											<?php if(isset($info['PHONE'])) echo 'value='.$info['PHONE'].''; ?>
+											style="margin-top:10px; height:25px; width:180px;"><br>
+					Email : <input type="email" name="email" placeholder="Email" maxlength="128"
+										<?php if(isset($info['EMAIL'])) echo 'value='.$info['EMAIL'].''; ?>
+										style="margin-top:10px; height:25px; width:180px;"><br>
 
-			<h1>
-         	   Change Password
-        	</h1>
+					<div <?php echo 'style='.(isset($_SESSION["infoErr"]) ? "color:red;" : "color:black;").''; ?>>
+		            <?php
+		                if (isset($_SESSION["infoErr"])) {
+		                    echo '' . $_SESSION["infoErr"] . '<br>';
+		                    unset($_SESSION["infoErr"]);
+		                } else if (isset($_SESSION["infoMsg"])) {
+		                	echo '' . $_SESSION["infoMsg"] . '<br>';
+		                    unset($_SESSION["infoMsg"]);
+		                }
+		            ?>
+            		</div>
 
- 			<form name="info" method="post" action="account.php?mode=account">
-				<!-- Ask for old pwd and new pwd twice -->
-				Old Password : <input type="password" name="opwd" style="margin-top:10px; height:25px; width:180px;"><br>
-				New Password : <input type="password" name="npwd" style="margin-top:10px; height:25px; width:180px;"><br>
-				Confirm New Password : <input type="password" name="cpwd" style="margin-top:10px; height:25px; width:180px;"><br>
+					<input type="submit" name="saveInfo" value="Save" style="margin-top:10px; height:25px; width:180px;">
+	 			</form>
 
-				<input type="submit" name="savePwd" value="Save" style="margin-top:10px; height:25px; width:180px;">
- 			</form>
-		<?php
+				<h1>
+	         	   Change Password
+	        	</h1>
+
+	 			<form name="info" method="post" action="account.php?mode=account">
+					<!-- Ask for old pwd and new pwd twice -->
+					Old Password : <input type="password" name="opwd" maxlength="24"
+											style="margin-top:10px; height:25px; width:180px;" required><br>
+					New Password : <input type="password" name="npwd" maxlength="24"
+											style="margin-top:10px; height:25px; width:180px;" required><br>
+					Confirm New Password : <input type="password" name="cpwd" maxlength="24"
+													style="margin-top:10px; height:25px; width:180px;" required><br>
+					            
+					<div <?php echo 'style='.(isset($_SESSION["pwdErr"]) ? "color:red;" : "color:black;").''; ?>>
+		            <?php
+		                if (isset($_SESSION["pwdErr"])) {
+		                    echo '' . $_SESSION["pwdErr"] . '<br>';
+		                    unset($_SESSION["pwdErr"]);
+		                } else if (isset($_SESSION["pwdMsg"])) {
+		                	echo '' . $_SESSION["pwdMsg"] . '<br>';
+		                    unset($_SESSION["pwdMsg"]);
+		                }
+		            ?>
+            		</div>
+
+					<input type="submit" name="savePwd" value="Save" style="margin-top:10px; height:25px; width:180px;">
+	 			</form>
+			<?php
+			} else {
+				echo "Account doesn't exist anymore";
+			}
         }
 
         // Free the statement identifier when closing the connection
@@ -185,6 +226,25 @@
 		}
     }
 
+	// Creates form for managing users
+    function manageForm() {
+    	echo "Incomplete <br>";
+    }
+
+   	// Creates form for generating a report
+    function generateForm() {
+    	echo "Incomplete<br>";
+    ?>
+    	<input type="text" list="diagnosisList" id="diagnosis"  placeholder="Diagnosis"  onkeyup="updateDiagnosisList(event)" autocomplete="off">
+    	<datalist id="diagnosisList"><datalist>
+    <?php
+    }
+
+   	// Creates form for data analysis
+    function analysisForm() {
+    	echo "Incomplete";
+    }
+
     // Creates form for logging out
     function logoutForm() {
     ?>
@@ -195,8 +255,119 @@
     }
 
     // Updates an account
-    function updateAccount() {
+    function updateInfo($usr, $pid) {
+    	// Establish connection
+        $conn = connect();
+        if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
 
+        // Sql command
+        $sql = 'UPDATE users 
+        		SET class = \''.$_POST["class"].'\' 
+        		WHERE user_name = \''.$usr.'\'';
+
+        // Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res1 = oci_execute($stid);
+
+		if (!$res1) {
+	        	// Error, retrieve the error using the oci_error() function & output an error message
+	     	   	$err = oci_error($stid);
+	     	   	echo htmlentities($err['message']);
+	        }
+
+		// Sql command
+        $sql = 'UPDATE persons
+        		SET first_name = \''.$_POST["fname"].'\', last_name =  \''.$_POST["lname"].'\',
+        			address = \''.$_POST["address"].'\', phone =  \''.$_POST["phone"].'\',
+        			email = \''.$_POST["email"].'\'
+        		WHERE person_id = \''.$pid.'\'';
+
+        // Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res2 = oci_execute($stid);
+
+		if (!$res2) {
+        	// Error, retrieve the error using the oci_error() function & output an error message
+     	   	$err = oci_error($stid);
+     	   	echo htmlentities($err['message']);
+        }
+
+        if ($res1 and $res2) $_SESSION["infoMsg"] = "Update successful";
+        else $_SESSION["infoErr"] = "An error occured";
+
+        // Free the statement identifier when closing the connection
+        oci_free_statement($stid);
+        oci_close($conn);
+    }
+
+    function updatePwd($usr) {
+    	if ($_POST["npwd"] == $_POST["cpwd"]) {
+    		// New password confirmed
+	    	// Establish connection
+	        $conn = connect();
+	        if (!$conn) {
+	            $e = oci_error();
+	            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+	        }
+
+	        // Sql command
+	        $sql = 'SELECT * FROM users WHERE LOWER(user_name) = \''.strtolower($usr).'\'';
+
+	        // Prepare sql using conn and returns the statement identifier
+	        $stid = oci_parse($conn, $sql);
+
+	        // Execute a statement returned from oci_parse()
+	        $res = oci_execute($stid);
+
+	        if (!$res) {
+	        	// Error, retrieve the error using the oci_error() function & output an error message
+	     	   	$err = oci_error($stid);
+	     	   	echo htmlentities($err['message']);
+	        } else {
+	        	// No error
+        		// Fetch account matching usr (should be unique)
+        		$account = oci_fetch_array($stid);
+	        	
+	        	if ($account and $_POST["opwd"] == $account["PASSWORD"]) {
+	        		// Account still exists and old password matches account password
+	        		// Sql command
+	       	 		$sql = 'UPDATE users 
+        					SET password = \''.$_POST["cpwd"].'\' 
+        					WHERE user_name = \''.$usr.'\'';
+
+			        // Prepare sql using conn and returns the statement identifier
+			        $stid = oci_parse($conn, $sql);
+
+			        // Execute a statement returned from oci_parse()
+			        $res = oci_execute($stid);
+
+			        if (!$res) {
+	        			// Error, retrieve the error using the oci_error() function & output an error message
+	     	   			$err = oci_error($stid);
+	     	   			echo htmlentities($err['message']);
+	        		} else {
+	        			$_SESSION["pwdMsg"] = "Password changed";
+	        		}
+	        	} else {
+	        		// Old password doesn't match account password
+	        		$_SESSION["pwdErr"] = "Incorrect password";
+	        	}
+	        }
+	        
+	        // Free the statement identifier when closing the connection
+	        oci_free_statement($stid);
+	        oci_close($conn);
+	    } else {
+	    	// New password not confirmed
+	    	$_SESSION["pwdErr"] = "Passwords do not match";
+	    }
     }
 
     // Convert a formatted string to date object
@@ -208,9 +379,44 @@
     function dateToString($date) {
     	return date_format($date,"j-M-Y");
     }
+
+    // Returns an array of all the types of diagnosis
+    function diagnosisArray() {
+    	$conn = connect();
+        if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
+
+        // Sql command
+        $sql = 'SELECT DISTINCT diagnosis FROM radiology_record
+        		ORDER BY diagnosis';
+
+        // Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res = oci_execute($stid);
+
+        $diagnosisArray = array();
+        if ($res) {
+	        while ($row = oci_fetch_array($stid)) {
+	        	array_push($diagnosisArray, $row["DIAGNOSIS"]);
+	        }
+		}	
+
+        // Free the statement identifier when closing the connection
+        oci_free_statement($stid);
+        oci_close($conn);
+
+        return $diagnosisArray;
+    }
 ?>
 
 <script>
+	// Set up a global variable for diagnosisArray
+	var diagnosisArray = new array(); 
+
 	// Adds another text input into the dynamic list of keywords
 	function addKeyword() {
 		var newdiv = document.createElement('div');
@@ -221,5 +427,66 @@
 	// Switches mode value
 	function switchMode(mode) {
 		document.getElementById('mode').value = mode;
+	}
+
+	function updateDiagnosisList(event) {
+		// Grab keycode
+		var x = event.which || event.keyCode;
+
+		if ((x < 37 || x > 40)) {
+			// Don't do anything on arrow key events
+			// Retrieve diagnosisList element
+			var list = document.getElementById('diagnosisList');
+
+			// Empty the list
+			list.innerHTML = '';
+
+			// Retrieve list of diagnosis
+			if (!diagnosisArray) {
+				// Assign diagnosisArray for the first time
+				diagnosisArray = 
+					<?php 	
+						echo json_encode(diagnosisArray()); 
+					?>;
+			}
+
+			// Filter diagnosisArray into newArray
+			var newArray = diagnosisArray.filter(isLike);
+
+			// Sort newArray
+			newArray.sort(isFirst);
+
+			// Show only up to the first 10 results
+			for(var i=0;i<newArray.length && i < 10;i++){
+				list.innerHTML += '<option>'+newArray[i]+'<option>';
+	    	}
+	    }
+	}
+
+	function isLike(element) {
+		// Obtain current diagnosis value
+		var diagnosis = document.getElementById('diagnosis');
+
+		if (diagnosis.value) {
+			// There is a value to filter by
+			// Show elements that contain the value
+	  		return element.toLowerCase().indexOf(diagnosis.value.toLowerCase()) > -1;
+	  	} else {
+	  		// There isn't a value to filter by, don't show any elements
+	  		return false;
+	  	}
+	}
+
+	function isFirst(a, b) {
+		// Obtain current diagnosis value
+		var diagnosis = document.getElementById('diagnosis');
+
+		if (diagnosis.value) {
+			// There is a value to sort by
+	  		return a.toLowerCase().indexOf(diagnosis.value.toLowerCase()) - b.toLowerCase().indexOf(diagnosis.value.toLowerCase());
+	  	} else {
+	  		// There isn't a value to sort by, don't change order
+	  		return -1;
+	  	}
 	}
 </script>

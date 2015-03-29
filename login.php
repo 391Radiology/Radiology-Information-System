@@ -37,7 +37,8 @@
                 $_SESSION["error"] = "Invalid username/password";
             } else {
                 // Account was found, save account id and type in session
-                $_SESSION["usr"] = $account[0];
+                $_SESSION["usr"] = $account["USER_NAME"];
+                $_SESSION["pid"] = $account["PERSON_ID"];
             }
         }
 
@@ -59,13 +60,14 @@
         <form name="login" method="post" style="margin-top:10px; text-align:center;">
             <input type="text" placeholder="Username" maxlength="24" name="usr" style="height:25px; width:180px;"><br>
             <input type="password" placeholder="Password" maxlength="24" name="pwd" style="margin-top:1px; height:25px; width:180px;"><br>
+            
             <div style="color:red;">
-        <?php
-            if (isset($_SESSION["error"])) {
-                echo '' . $_SESSION["error"] . '<br>';
-                session_unset("error");
-            }
-        ?>
+            <?php
+                if (isset($_SESSION["error"])) {
+                    echo '' . $_SESSION["error"] . '<br>';
+                    unset($_SESSION["error"]);
+                }
+            ?>
             </div>
 
             <input type="submit" name="login" value="Login" style="margin-top:10px; height:25px; width:180px;">

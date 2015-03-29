@@ -159,23 +159,23 @@
 
     		<!-- Start of date range for test date -->
 			Start Date : <input type="date" name="sdate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}" 
-		<?php
-       		if (isset($_GET['sdate']) and DateTime::createFromFormat('Y-m-j', $_GET['sdate'])) {
-       			// If there's a valid start date then set value of input to the submitted date
-       			echo 'value=', $_GET['sdate'];
-			}
-		?> 
-			style="margin-bottom:10px; height:25px; width:180px;">
+							<?php
+					       		if (isset($_GET['sdate']) and DateTime::createFromFormat('Y-m-j', $_GET['sdate'])) {
+					       			// If there's a valid start date then set value of input to the submitted date
+					       			echo 'value=', $_GET['sdate'];
+								}
+							?> 
+								style="margin-bottom:10px; height:25px; width:180px;">
 
 			<!-- End of date range for test date -->
 			End Date : <input type="date" name="edate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}"
-		<?php
-			if (isset($_GET['edate']) and DateTime::createFromFormat('Y-m-j', $_GET['edate'])) {
-				// If there's a valid end date then set value of input to the submitted date
-				echo 'value=', $_GET['edate'];	
-			}
-		?> 
-			style="margin-bottom:10px; height:25px; width:180px;">
+							<?php
+								if (isset($_GET['edate']) and DateTime::createFromFormat('Y-m-j', $_GET['edate'])) {
+									// If there's a valid end date then set value of input to the submitted date
+									echo 'value=', $_GET['edate'];	
+								}
+							?> 
+								style="margin-bottom:10px; height:25px; width:180px;">
 
 			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
 
@@ -233,10 +233,44 @@
 
    	// Creates form for generating a report
     function generateForm() {
-    	echo "Incomplete<br>";
     ?>
-    	<input type="text" list="diagnosisList" id="diagnosis"  placeholder="Diagnosis"  onkeyup="updateDiagnosisList(event)" autocomplete="off">
-    	<datalist id="diagnosisList"><datalist>
+    	<form name="search" method="get">
+    		<!-- Hidden mode value -->
+    		<input type="hidden" name="mode" value="generate">
+
+    		<!-- Diagnosis list -->
+	    	<input type="text" list="diagnosisList" id="diagnosis" name="diagnosis" placeholder="Diagnosis" maxlength="128"
+		<?php
+	   		if (isset($_GET['diagnosis']) and $_GET['diagnosis']) {
+	   			// If there's a valid start date then set value of input to the submitted date
+	   			echo 'value=', $_GET['diagnosis'];
+			}
+		?> 
+			onkeyup="updateDiagnosisList(event)" autocomplete="off" required>
+	    	<datalist id="diagnosisList"></datalist>
+
+			<!-- Start of date range for test date -->
+			Start Date : <input type="date" name="sdate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}" 
+							<?php
+						   		if (isset($_GET['sdate']) and DateTime::createFromFormat('Y-m-j', $_GET['sdate'])) {
+						   			// If there's a valid start date then set value of input to the submitted date
+						   			echo 'value=', $_GET['sdate'];
+								}
+							?> 
+								style="margin-bottom:10px; height:25px; width:180px;">
+
+			<!-- End of date range for test date -->
+			End Date : <input type="date" name="edate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}"
+							<?php
+								if (isset($_GET['edate']) and DateTime::createFromFormat('Y-m-j', $_GET['edate'])) {
+									// If there's a valid end date then set value of input to the submitted date
+									echo 'value=', $_GET['edate'];	
+								}
+							?> 
+								style="margin-bottom:10px; height:25px; width:180px;">
+
+			<input type="submit" name="generate" value="Generate" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
+		</form>
     <?php
     }
 

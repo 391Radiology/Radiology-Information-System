@@ -57,9 +57,9 @@
 			$sql = $sql.’TEST_TYPE’;
 			echo ‘<th> Test Type </th>’
 		}
-		$sql.’COUNT(image_id)’;
-		$sql.’FROM Information_for_data_analysis’;
-		$sql.’GROUP BY’;
+		$sql.=’COUNT(image_id)’;
+		$sql.=’FROM Information_for_data_analysis’;
+		$sql.=’GROUP BY’;
 		if(!empty($patient)){
 			$sql = $sql.’FIRST_NAME, LAST_NAME’;
 

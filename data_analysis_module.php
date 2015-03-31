@@ -30,13 +30,13 @@
 		}
 		if (!empty($date)){
 			if ($date == "Yearly"){
-				$sql = $sql.'TRUNC(TEST_DATE,\'IW\'),)';
+				$sql = $sql.'TRUNC(TEST_DATE,\'Y\'),)';
 				}
 			if ($date == "Monthly"){
 				$sql = $sql.'TRUNC(TEST_DATE,\'M\'),)';
 				}
 			if ($date == "Weekly"){
-				$sql = $sql.'TRUNC(TEST_DATE,\'Y\'),)';
+				$sql = $sql.'TRUNC(TEST_DATE,\'IW\'),)';
 				}
 			/*
 			if ($date == "Yearly"){
@@ -66,13 +66,13 @@
 		}
 		if (!empty($date)){
 			if ($date == "Yearly"){
-				$sql = $sql.'TRUNC(TEST_DATE,\'IW\'),)';
+				$sql = $sql.'TRUNC(TEST_DATE,\'Y\'),)';
 				}
 			if ($date == "Monthly"){
 				$sql = $sql.'TRUNC(TEST_DATE,\'M\'),)';
 				}
 			if ($date == "Weekly"){
-				$sql = $sql.'TRUNC(TEST_DATE,\'Y\'),)';
+				$sql = $sql.'TRUNC(TEST_DATE,\'IW\'),)';
 				}
 			/*
 			if ($date == "Yearly"){

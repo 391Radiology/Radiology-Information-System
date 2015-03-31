@@ -1,5 +1,5 @@
 <?php
-  
+  	 include_once("PHPconnectionDB.php");
     function search_keyword($keyWord, $sdate, $edate){        	
         //establish connection
         $conn = connect();
@@ -12,8 +12,8 @@
        	//$edate = DateTime::createFromFormat('Y-m-j', $edate);
 					
 			//implement KEYWORD /compsci/webdocs/zioueche/web_doc
-			$sql = 'SELECT 6*(score(1)+score(2))+3*score(3)+score(4) as rank, p.first_name, p.last_name, test_date, test_type
-						FROM radiology_record r, persons p 
+			$sql = 'SELECT 6*(score(1)+score(2))+3*score(3)+score(4) as rank, p.first_name, p.last_name, test_date, test_type, r.record_id as rid, 
+						FROM radiology_record r, persons p
 						WHERE p.person_id = r.patient_id 
 						AND (contains(first_name, \'%s\', 1)>0 
 						OR contains(last_name, \'%s\', 2) > 0 
@@ -32,13 +32,14 @@
 			?>
 			
 			<html>
-			<table border="1" class="query_results" >
+			<table border="1" class="clickable-row" >
 				<th align='center' valign='middle' width='100'>Result</th>
 				<th align='center' valign='middle' width='100'>DEBUG ONLY</th>
 				<th align='center' valign='middle' width='100'>First Name</th>
 				<th align='center' valign='middle' width='100'>Last Name</th>
 				<th align='center' valign='middle' width='100'>Test Date</th>
 				<th align='center' valign='middle' width='100'>Test Type</th>
+				<th align='center' valign='middle' width='100'>Images</th>
 
 			<?php
 			//prep connection
@@ -52,14 +53,34 @@
             echo htmlentities($err['message']);
         } else {
         		$pos = 1;
-            while ($record = oci_fetch_array($stid)) {
-					echo "<tr class= query_results>";
+        		//$part1 = $_SERVER['REQUEST_URI'];
+        		//$part2 = $_SERVER['QUERY_STRING'];
+        		//echo $_SERVER['REQUEST_URI'];
+            while ($record = oci_fetch_array($stid)) {	
+					echo "<tr>";
 					echo "<td align='center' valign='middle'>".$pos."</td>";
-               echo "<td>".$record[0]."</td>";
-               echo "<td>".$record[1]."</td>";
-               echo "<td>".$record[2]."</td>";
-               echo "<td align='center' valign='middle'>".$record[3]."</td>";
-               echo "<td>".$record[4]."</td>";
+               echo "<td >".$record["RANK"]."</td>";
+               echo "<td>".$record["FIRST_NAME"]."</td>";
+               echo "<td>".$record["LAST_NAME"]."</td>";
+               echo "<td align='center' valign='middle'>".$record["TEST_DATE"]."</td>";
+               echo "<td>".$record["TEST_TYPE"]."</td>";
+               echo "<td>";
+               $sql = 'SELECT thumbnail, image_id
+            				FROM pacs_images pc
+            				WHERE'.$record["RID"].'= pacs_images.record_id';
+            	$stid = oci_parse($conn, $sql);
+            	$res = oci_execute($stid);
+					if (!$res) {
+           			 $err = oci_error($stid);
+            		echo htmlentities($err['message']);
+        				} else {
+               while ($reco_img = oci_fetch_array($stid)){
+               	for ($i = 0;$i < count($reco_img); $i++){
+							"<img".$reco_img[$i].">";               		
+               		}
+               	}
+               echo "</td>";
+               //echo "<td>"."FULL IN HERE"."</td>";
                echo "</tr>";
                $pos += 1;
                 //echo $record[0].'  |   ', $record[1].'   |  ', $record[2].'   |  ', $record[3].' | ',$record[4].' | ' , '<br/>';
@@ -68,6 +89,7 @@
         // Free the statement identifier when closing the connection
         oci_free_statement($stid);
         oci_close($conn);
+    }
     }
 ?>
 			</table>

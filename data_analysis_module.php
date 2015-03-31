@@ -24,7 +24,7 @@
 		$sql = ’SELECT’;
 		//set up which factor to choose
 		if(!empty($patient)){
-			$sql = $sql.’FIRST_NAME, LAST_NAME’;
+			$sql = $sql.’i.FIRST_NAME, i.LAST_NAME’;
 			echo '<th> First Name </th>';
             		echo '<th> Last Name </th>';
 		}
@@ -58,7 +58,7 @@
 			echo ‘<th> Test Type </th>’
 		}
 		$sql.=’COUNT(image_id)’;
-		$sql.=’FROM Information_for_data_analysis’;
+		$sql.=’FROM Information_for_data_analysis i’;
 		$sql.=’GROUP BY’;
 		if(!empty($patient)){
 			$sql = $sql.’FIRST_NAME, LAST_NAME’;

@@ -277,6 +277,34 @@
    	// Creates form for data analysis
     function analysisForm() {
     	echo "Incomplete";
+    	    ?>
+    	<form name="search" method="get">
+    		<!-- Hidden mode value -->
+    		<input type="hidden" name="mode" value="generate">
+
+    		<!-- Diagnosis list -->
+	    	Patient : <input type="text" list="diagnosisList" id="diagnosis" name="diagnosis" placeholder="none" maxlength="128"
+    		<!-- Test_type list -->
+	    	Test Type : <input type="text" list="diagnosisList" id="diagnosis" name="diagnosis" placeholder="none" maxlength="128"
+    		<!-- Time list -->
+	    	Period Of Time : <input type="text" list="diagnosisList" id="diagnosis" name="diagnosis" placeholder="none" maxlength="128"
+		<?php
+	   		if (isset($_GET['diagnosis']) and $_GET['diagnosis']) {
+	   			// If there's a valid start date then set value of input to the submitted date
+	   			echo 'value=', $_GET['diagnosis'];
+			}
+		?> 
+		
+			onkeyup="updateDiagnosisList(event)" autocomplete="off" required>
+	    	<datalist id="diagnosisList"></datalist>
+
+
+
+
+
+			<input type="submit" name="generate" value="Generate" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
+		</form>
+    <?php
     }
 
     // Creates form for logging out

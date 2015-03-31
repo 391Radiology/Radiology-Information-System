@@ -8,8 +8,8 @@
             trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
         }
         //echo $sdate;
-			$sdate = DateTime::createFromFormat('Y-m-j', $sdate);
-       	$edate = DateTime::createFromFormat('Y-m-j', $edate);
+			//$sdate = DateTime::createFromFormat('Y-m-j', $sdate);
+       	//$edate = DateTime::createFromFormat('Y-m-j', $edate);
 					
 			//implement KEYWORD /compsci/webdocs/zioueche/web_doc
 			$sql = 'SELECT 6*(score(1)+score(2))+3*score(3)+score(4) as rank, p.first_name, p.last_name, test_date, test_type
@@ -21,8 +21,8 @@
 						OR contains(description, \'%s\', 4) > 0
 						)';
 			
-			if ($sdate) $sql =' '.$sql.' AND test_date >= \''.date_format($sdate,"j-M-Y").'\'';		
-			if ($edate) $sql = ' '.$sql.' AND test_date <= \''.date_format($edate,"j-M-Y").'\'';
+			if ($sdate) $sql =' '.$sql.' AND test_date >= \''.$sdate.'\'';		
+			if ($edate) $sql = ' '.$sql.' AND test_date <= \''.$edate.'\'';
 			
 			$rest_of_query = ' ORDER BY (6*(score(1)+score(2))+3*score(3)+score(4))';
 			$sql2 = sprintf($sql, $keyWord,$keyWord,$keyWord,$keyWord);

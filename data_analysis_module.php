@@ -27,12 +27,21 @@
 			echo '<th> First Name </th>';
             		echo '<th> Last Name </th>';
 		}
-		if (!empty(date)){
-			$sql = $sql.’TEST_DATE’;
+		if (!empty($date)){
+			if ($date == "Yearly"){
+				$sql = $sql.'to_char(r.TEST_DATE,\'W\'),)';
+				}
+			if ($date == "Monthly"){
+				$sql = $sql.'to_char(r.TEST_DATE,\'M\'),)';
+				}
+			if ($date == "Weekly"){
+				$sql = $sql.'to_char(r.TEST_DATE,\'Y\'),)';
+				}
+			//$sql = $sql.’TEST_DATE’;
 			echo ‘<th> Date </th>’;
 
 		}
-		if (!empty(test_type)){
+		if (!empty($test_type)){
 			$sql = $sql.’TEST_TYPE’;
 			echo ‘<th> Test Type </th>’
 		}
@@ -43,11 +52,21 @@
 			$sql = $sql.’FIRST_NAME, LAST_NAME’;
 
 		}
-		if (!empty(date)){
+		if (!empty($date)){
+			if ($date == "Yearly"){
+				$sql = $sql.'to_char(r.TEST_DATE,\'W\'),)';
+				}
+			if ($date == "Monthly"){
+				$sql = $sql.'to_char(r.TEST_DATE,\'M\'),)';
+				}
+			if ($date == "Weekly"){
+				$sql = $sql.'to_char(r.TEST_DATE,\'Y\'),)';
+				}
+
 			$sql = $sql.’TEST_DATE’;
 
 		}
-		if (!empty(test_type)){
+		if (!empty($test_type)){
 			$sql = $sql.’TEST_TYPE’;
 		}
 		

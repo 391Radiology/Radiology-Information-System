@@ -74,9 +74,10 @@
             		echo htmlentities($err['message']);
             		
        			 } else{
-       			 			for ($i = 0; $i < count($try = oci_fetch_array($test)); $i++){
-									  echo $i;
-								}	 		
+       			 			//for ($i = 0; $i < count($try = oci_fetch_array($test)); $i++){
+										$try = oci_fetch_array($test);								  
+									  echo count($try);
+								
        			 		}
 
        			 	

@@ -1,4 +1,5 @@
 <?php
+	//$date has three options:"Weekly", "Monthly" or "Weekly"
  	function data_analysis($patient,$date,$test_type){
 	 	$conn=connect();
 			if (!$conn) {
@@ -6,7 +7,7 @@
   			trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
    		}
 
-		//First create a table contains the information for data analysis
+		//Create a Table to get all the information that useful to data_analysis
 		
 		$sql = 'CREATE Information_for_data_analysis AS 
                 SELECT p.FIRST_NAME, p.LAST_NAME, r.TEST_TYPE, r.TEST_DATE, i.IMAGE_ID 
@@ -17,9 +18,9 @@
 
 		$res = oci_execute($stid);
 
-		//$date = DateTime::createFromFormat('Y-M-J', $date);
+	//Create sql part by part
 	
-	 	//sql and meanwhile create table to show
+	 	
 		$sql = ’SELECT’;
 		//set up which factor to choose
 		if(!empty($patient)){
@@ -29,13 +30,13 @@
 		}
 		if (!empty($date)){
 			if ($date == "Yearly"){
-				$sql = $sql.'to_char(r.TEST_DATE,\'W\'),)';
+				$sql = $sql.'to_char(TEST_DATE,\'W\'),)';
 				}
 			if ($date == "Monthly"){
-				$sql = $sql.'to_char(r.TEST_DATE,\'M\'),)';
+				$sql = $sql.'to_char(TEST_DATE,\'M\'),)';
 				}
 			if ($date == "Weekly"){
-				$sql = $sql.'to_char(r.TEST_DATE,\'Y\'),)';
+				$sql = $sql.'to_char(TEST_DATE,\'Y\'),)';
 				}
 			//$sql = $sql.’TEST_DATE’;
 			echo ‘<th> Date </th>’;
@@ -54,16 +55,16 @@
 		}
 		if (!empty($date)){
 			if ($date == "Yearly"){
-				$sql = $sql.'to_char(r.TEST_DATE,\'W\'),)';
+				$sql = $sql.'to_char(TEST_DATE,\'W\'),)';
 				}
 			if ($date == "Monthly"){
-				$sql = $sql.'to_char(r.TEST_DATE,\'M\'),)';
+				$sql = $sql.'to_char(TEST_DATE,\'M\'),)';
 				}
 			if ($date == "Weekly"){
-				$sql = $sql.'to_char(r.TEST_DATE,\'Y\'),)';
+				$sql = $sql.'to_char(TEST_DATE,\'Y\'),)';
 				}
 
-			$sql = $sql.’TEST_DATE’;
+			//$sql = $sql.’TEST_DATE’;
 
 		}
 		if (!empty($test_type)){

@@ -1,63 +1,41 @@
 <?php
- 	function report_generating($date,$diagnosis){
-	 	$conn=connect();
-			if (!$conn) {
-  			$e = oci_error();
-  			trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
-   		} 	
-	 	//sql 
-		$date = DateTime::createFromFormat('Y-M-J', $date);
-		$sql = 'SELECT persons.first_name, persons.last_name, persons.address, persons.phone, radiology_record.test_date, radiology_record.diagnosis
-			    FROM persons, radiology_record
-			    WHERE persons.person_id = radiology_record.patient_id AND radiology_record.diagnosis = \''.$diagnosis.'\' AND radiology_record.test_date > '.date_format($date,"J-M-Y");
+	include_once("PHPconnectionDB.php");
 	
-		$sql.= 'GROUP BY first_name, last_name, address, phone, diagnosis';
-	 	$stid = oci_parse($conn, $sql );
-	 	$res=oci_execute($stid);
-	 	while (($row = oci_fetch_array($stid, OCI_ASSOC))) {
-	 		echo '<tr>';
-			foreach ($row as $item) {
-				
-				echo '<td> $item </td>';
+ 	function report_generating($diagnosis, $sdate, $edate){
+ 		// Establish connection
+        $conn = connect();
+        if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
 
-			}
-			echo '<tr>';
-			//echo 'Name: '.$row[1].$row[2].'Address'.$row[3].'Phone:'.$row[4]."test date:".row[5].
-			}
-		echo '<br/>';
+      // Sql command
+		$sql = 'SELECT p.first_name, p.last_name, p.address, p.phone, MIN(r.test_date)
+			    FROM persons p, radiology_record r
+			    WHERE p.person_id = r.patient_id AND LOWER(r.diagnosis) = \''.strtolower($diagnosis).'\' AND r.test_date >= \''.$sdate.'\'
+			    GROUP BY p.first_name, p.last_name, p.address, p.phone
+			    ORDER BY MIN(r.test_date)';
+
+		// Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res = oci_execute($stid);
+	 	
+	 	  if (!$res) {
+        	// Error, retrieve the error using the oci_error() function & output an error message
+     	   	$err = oci_error($stid);
+     	   	echo htmlentities($err['message']);
+        } else {
+        	// No error
+        	// Fetch and output info
+        	echo 'Results for:<br>Diagnosis: '.$diagnosis.'<br>Start Date: '.$sdate.' End Date: '.$edate.'<br>';
+			while ($info = oci_fetch_array($stid)) {
+	 		echo ''.$info["FIRST_NAME"].' '.$info["LAST_NAME"].' '.$info["ADDRESS"].' '.$info["PHONE"].' '.$info["MIN(R.TEST_DATE)"].'<br>';
+        }
+
 		oci_free_statement($stid);
 		oci_close($conn);
 	 	}
- 	
+}
 ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

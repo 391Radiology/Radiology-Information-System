@@ -2,7 +2,8 @@
 	session_start();
 	include_once("PHPconnectionDB.php");
 	include_once("key_search.php");
-
+	include_once("report_generating_module.php");
+	
 	// Establish global types array
 	$types = array('a' => 'Admin',
 			'd' => 'Doctor',
@@ -82,19 +83,19 @@
 
 					<!-- Basic personal information -->
 					First Name : <input type="text" name="fname" placeholder="First Name" maxlength="24"
-										<?php if(isset($info['FIRST_NAME'])) echo 'value='.$info['FIRST_NAME'].''; ?>
+										<?php if (isset($info['FIRST_NAME'])) echo 'value='.$info['FIRST_NAME'].''; ?>
 										style="margin-top:10px; height:25px; width:180px;" required><br>
 					Last Name : <input type="text" name="lname" placeholder="Last Name" maxlength="24"
-										<?php if(isset($info['LAST_NAME'])) echo 'value='.$info['LAST_NAME'].''; ?>
+										<?php if (isset($info['LAST_NAME'])) echo 'value='.$info['LAST_NAME'].''; ?>
 										style="margin-top:10px; height:25px; width:180px;" required><br>
 					Address : <input type="text" name="address" placeholder="Address" maxlength="128"
-										<?php if(isset($info['ADDRESS'])) echo 'value='.$info['ADDRESS'].''; ?>
+										<?php if (isset($info['ADDRESS'])) echo 'value='.$info['ADDRESS'].''; ?>
 										style="margin-top:10px; height:25px; width:180px;"><br>
 					Phone Number : <input type="text" name="phone" placeholder="10 digit phone number" pattern="[0-9]{10}" 
-											<?php if(isset($info['PHONE'])) echo 'value='.$info['PHONE'].''; ?>
+											<?php if (isset($info['PHONE'])) echo 'value='.$info['PHONE'].''; ?>
 											style="margin-top:10px; height:25px; width:180px;"><br>
 					Email : <input type="email" name="email" placeholder="Email" maxlength="128"
-										<?php if(isset($info['EMAIL'])) echo 'value='.$info['EMAIL'].''; ?>
+										<?php if (isset($info['EMAIL'])) echo 'value='.$info['EMAIL'].''; ?>
 										style="margin-top:10px; height:25px; width:180px;"><br>
 
 					<div <?php echo 'style='.(isset($_SESSION["infoErr"]) ? "color:red;" : "color:black;").''; ?>>
@@ -184,7 +185,7 @@
 			<?php
 				for($n=0; $n < (isset($_GET["key"]) ? count($_GET["key"]) : 1); $n++) {
 					// If there is a list of keywords, iterate through it, else just go through loop once
-					if(!isset($_GET["key"]) or $_GET["key"][$n] or ($n == 0 and count(array_filter($_GET["key"])) == 0)) {
+					if (!isset($_GET["key"]) or $_GET["key"][$n] or ($n == 0 and count(array_filter($_GET["key"])) == 0)) {
 					?>
 						<!-- If there was no list of keys, there is a valid key at position n, or n == 0 with no valid values in the list of keys
 							then make a new text input. If there is a valid key at position n then set the value to the key -->
@@ -228,7 +229,28 @@
 
 	// Creates form for managing users
     function manageForm() {
-    	echo "Incomplete <br>";
+    ?>
+    	<form name="manage" method="get">
+    		<!-- Hidden mode value -->
+    		<input type="hidden" name="mode" value="manage">
+    		
+    		<!-- Search parameters -->
+    		Username : <input type="text" name="usr" placeholder="Username" 
+    		<?php if (isset($_GET['usr']) and $_GET['usr']) {echo 'value='.$_GET['usr'].''; $_GET['fname'] = ''; $_GET['lname'] = '';} ?>
+    		style="margin-bottom:10px; height:25px; width:180px;"> 
+			First Name : <input type="text" name="fname" placeholder="First Name" 
+			<?php if (isset($_GET['fname']) and $_GET['fname']) echo 'value='.$_GET['fname'].''; ?>
+			style="margin-bottom:10px; height:25px; width:180px;"> 
+			Last Name : <input type="text" name="lname" placeholder="Last Name" 
+			<?php if (isset($_GET['lname']) and $_GET['lname']) echo 'value='.$_GET['lname'].''; ?>
+			style="margin-bottom:10px; height:25px; width:180px;"> 
+			
+			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
+    	</form>
+    <?php
+    	if (isset($_GET['search'])) {
+			obtainUsers($_GET['usr'], $_GET['fname'], $_GET['lname']);
+    	}
     }
 
    	// Creates form for generating a report
@@ -239,7 +261,7 @@
     		<input type="hidden" name="mode" value="generate">
 
     		<!-- Diagnosis list -->
-	    	<input type="text" list="diagnosisList" id="diagnosis" name="diagnosis" placeholder="Diagnosis" maxlength="128"
+	    	Diagnosis : <input type="text" list="diagnosisList" id="diagnosis" name="diagnosis" placeholder="Diagnosis" maxlength="128"
 		<?php
 	   		if (isset($_GET['diagnosis']) and $_GET['diagnosis']) {
 	   			// If there's a valid start date then set value of input to the submitted date
@@ -257,7 +279,7 @@
 						   			echo 'value=', $_GET['sdate'];
 								}
 							?> 
-								style="margin-bottom:10px; height:25px; width:180px;">
+								style="margin-bottom:10px; height:25px; width:180px;" required>
 
 			<!-- End of date range for test date -->
 			End Date : <input type="date" name="edate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}"
@@ -267,44 +289,22 @@
 									echo 'value=', $_GET['edate'];	
 								}
 							?> 
-								style="margin-bottom:10px; height:25px; width:180px;">
+								style="margin-bottom:10px; height:25px; width:180px;" required>
 
 			<input type="submit" name="generate" value="Generate" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
 		</form>
     <?php
+		if (isset($_GET['generate'])) {
+			$sdate = stringToDate($_GET["sdate"]);
+			$edate = stringToDate($_GET["edate"]);
+			
+			report_generating($_GET['diagnosis'], ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null));
+    	}
     }
 
    	// Creates form for data analysis
     function analysisForm() {
     	echo "Incomplete";
-    	    ?>
-    	<form name="search" method="get">
-    		<!-- Hidden mode value -->
-    		<input type="hidden" name="mode" value="generate">
-
-    		<!-- Diagnosis list -->
-	    	Patient : <input type="text" list="diagnosisList" id="diagnosis" name="diagnosis" placeholder="none" maxlength="128"
-    		<!-- Test_type list -->
-	    	Test Type : <input type="text" list="diagnosisList" id="diagnosis" name="diagnosis" placeholder="none" maxlength="128"
-    		<!-- Time list -->
-	    	Period Of Time : <input type="text" list="diagnosisList" id="diagnosis" name="diagnosis" placeholder="none" maxlength="128"
-		<?php
-	   		if (isset($_GET['diagnosis']) and $_GET['diagnosis']) {
-	   			// If there's a valid start date then set value of input to the submitted date
-	   			echo 'value=', $_GET['diagnosis'];
-			}
-		?> 
-		
-			onkeyup="updateDiagnosisList(event)" autocomplete="off" required>
-	    	<datalist id="diagnosisList"></datalist>
-
-
-
-
-
-			<input type="submit" name="generate" value="Generate" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
-		</form>
-    <?php
     }
 
     // Creates form for logging out
@@ -431,7 +431,51 @@
 	    	$_SESSION["pwdErr"] = "Passwords do not match";
 	    }
     }
+	
+	 function obtainUsers($usr, $fname, $lname) {
+	 	// Establish connection
+    	$conn = connect();
+		if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
 
+        // Sql command
+        $sql = 'SELECT * 
+        				FROM users u, persons p 
+        				WHERE u.person_id = p.person_id';
+			if ($usr) {
+				$sql = ''.$sql.' AND LOWER(u.user_name) = \''.strtolower($usr).'\'';
+			}
+			else {
+				if ($fname) $sql = ''.$sql.' AND LOWER(p.first_name) = \''.strtolower($fname).'\'';
+				if ($lname) $sql = ''.$sql.' AND LOWER(p.last_name) = \''.strtolower($lname).'\'';
+			}
+			$sql = ''.$sql.' ORDER BY u.user_name'; 
+
+        // Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res = oci_execute($stid);
+        
+        if (!$res) {
+        	// Error, retrieve the error using the oci_error() function & output an error message
+     	   	$err = oci_error($stid);
+     	   	echo htmlentities($err['message']);
+        } else {
+        	// No error
+        	// Fetch and output info
+        	while ($info = oci_fetch_array($stid)) {
+				echo ''.$info["USER_NAME"].' '.$info["FIRST_NAME"].' '.$info["LAST_NAME"].' <br>';        	
+			}
+        }
+        	
+        // Free the statement identifier when closing the connection
+        oci_free_statement($stid);
+        oci_close($conn);
+	 }
+	 
     // Convert a formatted string to date object
     function stringToDate($date) {
     	return DateTime::createFromFormat('Y-m-j', $date);
@@ -444,6 +488,7 @@
 
     // Returns an array of all the types of diagnosis
     function diagnosisArray() {
+    	// Establish connection
     	$conn = connect();
         if (!$conn) {
             $e = oci_error();
@@ -451,8 +496,8 @@
         }
 
         // Sql command
-        $sql = 'SELECT DISTINCT diagnosis FROM radiology_record
-        		ORDER BY diagnosis';
+        $sql = 'SELECT DISTINCT UPPER(diagnosis) FROM radiology_record
+        		ORDER BY UPPER(diagnosis)';
 
         // Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql);
@@ -463,7 +508,7 @@
         $diagnosisArray = array();
         if ($res) {
 	        while ($row = oci_fetch_array($stid)) {
-	        	array_push($diagnosisArray, $row["DIAGNOSIS"]);
+	        	array_push($diagnosisArray, $row["UPPER(DIAGNOSIS)"]);
 	        }
 		}	
 

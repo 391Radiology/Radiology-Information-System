@@ -33,27 +33,29 @@
         	echo 'Results for:<br>Diagnosis: '.$diagnosis.'<br>Start Date: '.$sdate.' End Date: '.$edate.'<br>';
         	if ($info = oci_fetch_array($stid)) {
         	?>
-        		<table border="1">
-        		<th width="100" align="center" valign="middle">First Name</th>
-        		<th width="100" align="center" valign="middle">Last Name</th>
-        		<th width="100" align="center" valign="middle">Address</th>
-        		<th width="100" align="center" valign="middle">Phone</th>
-        		<th width="100" align="center" valign="middle">Test Date</th>
-        	<?php
-				while ($info) {
-				?>
-				 	<tr>
-						<td><?php echo $info["FIRST_NAME"]; ?></td>	
-						<td><?php echo $info["LAST_NAME"]; ?></td>
-						<td><?php echo $info["ADDRESS"]; ?></td>
-						<td><?php echo $info["PHONE"]; ?></td>	
-						<td><?php echo $info["MIN(R.TEST_DATE)"]; ?></td>	
-					</tr>
-	 			<?php
-	 				$info = oci_fetch_array($stid);
-        		}
-        	?>
-				</table>
+        		<div style="height:500px; width:intrinsic; overflow:auto;">
+	        		<table border="1">
+	        		<th width="100" align="center" valign="middle">First Name</th>
+	        		<th width="100" align="center" valign="middle">Last Name</th>
+	        		<th width="100" align="center" valign="middle">Address</th>
+	        		<th width="100" align="center" valign="middle">Phone</th>
+	        		<th width="100" align="center" valign="middle">Test Date</th>
+	        	<?php
+					while ($info) {
+					?>
+					 	<tr onMouseover="this.bgColor='#ADD8E6'"onMouseout="this.bgColor='#FFFFFF'">
+							<td><?php echo $info["FIRST_NAME"]; ?></td>	
+							<td><?php echo $info["LAST_NAME"]; ?></td>
+							<td><?php echo $info["ADDRESS"]; ?></td>
+							<td><?php echo $info["PHONE"]; ?></td>	
+							<td><?php echo $info["MIN(R.TEST_DATE)"]; ?></td>	
+						</tr>
+		 			<?php
+		 				$info = oci_fetch_array($stid);
+	        		}
+	        	?>
+					</table>
+				</div>
 			<?php
         	} else {
         		// Error message for having no matching results

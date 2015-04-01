@@ -3,6 +3,7 @@
 	include_once("PHPconnectionDB.php");
 	include_once("key_search.php");
 	include_once("report_generating_module.php");
+	include_once("data_analysis_module.php");
 	
 	// Establish global types array
 	$types = array('a' => 'Admin',
@@ -354,7 +355,7 @@
     	</form>
     <?php
     	if (isset($_GET['analysis'])) {
-			//data_analysis($_GET['fname'], $_GET['lname'], $_GET['test_type'],($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null));
+			data_analysis($_GET['fname'], $_GET['lname'], $_GET['test_type'],($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null));
 			echo 'information : ',$_GET['fname'];
 			echo 'information : ',$_GET['sdate'];
     	}

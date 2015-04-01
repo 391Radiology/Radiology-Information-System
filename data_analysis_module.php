@@ -14,19 +14,67 @@
 					 FROM PERSONS p, RADIOLOGY_RECORD r, PACS_IMAGES i
                 WHERE p.PERSON_ID = r.PATIENT_ID AND i.RECORD_ID = r.RECORD_ID 
                 GROUP BY p.FIRST_NAME, p.LAST_NAME, r.TEST_TYPE, r.TEST_DATE';
-                
+              
 		$stid = oci_parse($conn, $sql);
 
 		$res = oci_execute($stid);
 		
 		
+
+		
+		//r.test_date >= \''.$sdate.'\' AND r.test_date <= \''.$edate.'\'
+		$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,i.image_count
+			    FROM Information_for_data_analysis i
+			     ';
+			     
+
+		
+	
+		
+		
+		
+		if(!empty($fname)&&!empty($lname)&&empty($test_type)&&$_GET['sdate']==''&&$_GET['edate']==''){
+			echo'<th> name</th>';
+			$sql.='WHERE LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\'';
+			}
+		if(empty($fname)&&empty($lname)&&!empty($test_type)&&$_GET['sdate']==''&&$_GET['edate']==''){
+			echo'<th> type</th>';
+			$sql.='WHERE i.TEST_TYPE = \''.($test_type).'\' ';
+			}
+		if(empty($fname)&&empty($lname)&&empty($test_type)&&$_GET['sdate']!=''&&$_GET['edate']!=''){
+			echo'<th> time</th>';
+			$sql.='WHERE i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' ';
+			}
+		if(!empty($fname)&&!empty($lname)&&!empty($test_type)&&$_GET['sdate']==''&&$_GET['edate']==''){
+			echo'<th> name type!!!!!!</th>';
+			$sql.='WHERE  LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\' AND i.TEST_TYPE = \''.($test_type).'\'';
+			}
+		if(empty($fname)&&empty($lname)&&!empty($test_type)&&$_GET['sdate']!=''&&$_GET['edate']!=''){
+			echo'<th> time type</th>';
+			$sql.='WHERE i.TEST_TYPE = \''.($test_type).'\' AND i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\'  ';
+			}
+		if(!empty($fname)&&!empty($lname)&&empty($test_type)&&$_GET['sdate']!=''&&$_GET['edate']!=''){
+			echo'<th> name time</th>';
+			$sql.='WHERE  i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' AND LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\'';
+			}
+		if(!empty($fname)&&!empty($lname)&&!empty($test_type)&&$_GET['sdate']!=''&&$_GET['edate']!=''){
+			echo'<th> name time type</th>';
+			$sql.='WHERE i.TEST_TYPE = \''.($test_type).'\' AND i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' AND LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\'';
+			}
+		if(empty($fname)&&empty($lname)&&empty($test_type)&&$_GET['sdate']==''&&$_GET['edate']==''){
+			echo'<th> nothing</th>';
+			}
+		
+
+					
+			
+			//echo'<th> one not empty</th>';
+
+		
+
 		
 
 
-      // Sql command
-		$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,i.image_count
-			    FROM Information_for_data_analysis i
-			    WHERE LOWER(i.TEST_TYPE) = \''.strtolower($test_type).'\' ';
 
 		// Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql);
@@ -91,78 +139,10 @@
 				echo '</td>';
 			}
 				}
-
+*/
 	//Create sql part by part
 	
-	 	/*
-		$sql = 'SELECT';
-		//set up which factor to choose
-		if(!empty($patient)){
-			$sql = $sql.'i.FIRST_NAME, i.LAST_NAME';
-			echo '<th> First Name </th>';
-            		echo '<th> Last Name </th>';
-		}
-		if (!empty($date)){
-			if ($date == "Yearly"){
-				$sql = $sql.'TRUNC(TEST_DATE,\'Y\'),)';
-				}
-			if ($date == "Monthly"){
-				$sql = $sql.'TRUNC(TEST_DATE,\'M\'),)';
-				}
-			if ($date == "Weekly"){
-				$sql = $sql.'TRUNC(TEST_DATE,\'IW\'),)';
-				}
-
-			echo '<th> Date </th>';
-
-		}
-		if (!empty($test_type)){
-			$sql = $sql.'TEST_TYPE';
-			echo '<th> Test Type </th>'
-		}
-		$sql.='COUNT(image_id)';
-		$sql.='FROM Information_for_data_analysis i';
-		$sql.='GROUP BY';
-		if(!empty($patient)){
-			$sql = $sql.'FIRST_NAME, LAST_NAME';
-
-		}
-		if (!empty($date)){
-			if ($date == "Yearly"){
-				$sql = $sql.'TRUNC(TEST_DATE,\'Y\'),)';
-				}
-			if ($date == "Monthly"){
-				$sql = $sql.'TRUNC(TEST_DATE,\'M\'),)';
-				}
-			if ($date == "Weekly"){
-				$sql = $sql.'TRUNC(TEST_DATE,\'IW\'),)';
-				}
-
-			
-
-			//$sql = $sql.'TEST_DATE';
-
-		}
-		if (!empty($test_type)){
-			$sql = $sql.'TEST_TYPE';
-		}
-		
-
-		
-
-
-		$stid = oci_parse($conn, $sql );
-	 	$res=oci_execute($stid);
-	 	while (($row = oci_fetch_array($stid, OCI_ASSOC))) {
-			foreach ($row as $item) {
-				echo '<td>';
-				echo $item;
-				echo '</td>';
-
-			
-			
-			}
-			*/
+	 	
 		echo '<br/>';
 		oci_free_statement($stid);
 		oci_close($conn);

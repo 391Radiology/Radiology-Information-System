@@ -12,7 +12,8 @@
       // Sql command
 		$sql = 'SELECT p.first_name, p.last_name, p.address, p.phone, MIN(r.test_date)
 			    FROM persons p, radiology_record r
-			    WHERE p.person_id = r.patient_id AND LOWER(r.diagnosis) = \''.strtolower($diagnosis).'\' AND r.test_date >= \''.$sdate.'\'
+			    WHERE p.person_id = r.patient_id AND LOWER(r.diagnosis) = \''.strtolower($diagnosis).'\' 
+			    		AND r.test_date >= \''.$sdate.'\' AND r.test_date <= \''.$edate.'\'
 			    GROUP BY p.first_name, p.last_name, p.address, p.phone
 			    ORDER BY MIN(r.test_date)';
 
@@ -30,9 +31,38 @@
         	// No error
         	// Fetch and output info
         	echo 'Results for:<br>Diagnosis: '.$diagnosis.'<br>Start Date: '.$sdate.' End Date: '.$edate.'<br>';
-			while ($info = oci_fetch_array($stid)) {
-	 		echo ''.$info["FIRST_NAME"].' '.$info["LAST_NAME"].' '.$info["ADDRESS"].' '.$info["PHONE"].' '.$info["MIN(R.TEST_DATE)"].'<br>';
-        }
+        	if ($info = oci_fetch_array($stid)) {
+        	?>
+        		<table border="1">
+        		<th width="100" align="center" valign="middle">First Name</th>
+        		<th width="100" align="center" valign="middle">Last Name</th>
+        		<th width="100" align="center" valign="middle">Address</th>
+        		<th width="100" align="center" valign="middle">Phone</th>
+        		<th width="100" align="center" valign="middle">Test Date</th>
+        	<?php
+				while ($info) {
+				?>
+				 	<tr>
+						<td><?php echo $info["FIRST_NAME"]; ?></td>	
+						<td><?php echo $info["LAST_NAME"]; ?></td>
+						<td><?php echo $info["ADDRESS"]; ?></td>
+						<td><?php echo $info["PHONE"]; ?></td>	
+						<td><?php echo $info["MIN(R.TEST_DATE)"]; ?></td>	
+					</tr>
+	 			<?php
+	 				$info = oci_fetch_array($stid);
+        		}
+        	?>
+				</table>
+			<?php
+        	} else {
+        		// Error message for having no matching results
+			?>
+				<div style="color:red;">
+					No matching results
+				</div>		
+			<?php
+        	}
 
 		oci_free_statement($stid);
 		oci_close($conn);

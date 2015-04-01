@@ -36,7 +36,7 @@
    		// Try to update info if previous request was made
     	if (isset($_POST["saveInfo"])) updateInfo($usr, $pid);
 		else if (isset($_POST["savePwd"])) updatePwd($usr);
-
+		
         // Sql command
         $sql = 'SELECT u.user_name, p.person_id, u.class, p.first_name, p.last_name, p.address, p.phone, p.email  
         		FROM users u, persons p 
@@ -69,33 +69,32 @@
 	        	<!-- -->
 				<form name="info" method="post" action="account.php?mode=account">
 					<!-- Create a selection for account types -->
-					Account Type : 
-					<select name = "class">
-	    			<?php
-						foreach ($types as $key => $type) {
-							// Add every type from types into the selection
-						?>
-							<option <?php echo 'value='.$key.' '.($key == $info['CLASS'] ? 'selected': '').''; ?>><?php echo ''.$type.''; ?></option>
-						<?php
-						}
-					?>
-	  				</select><br>
+					Account Type : <select name = "class">
+	    								<?php
+											foreach ($types as $key => $type) {
+												// Add every type from types into the selection
+											?>
+												<option <?php echo 'value='.$key.' '.($key == $info['CLASS'] ? 'selected': '').''; ?>><?php echo ''.$type.''; ?></option>
+											<?php
+											}
+										?>
+	  									</select><br>
 
 					<!-- Basic personal information -->
 					First Name : <input type="text" name="fname" placeholder="First Name" maxlength="24"
-										<?php if (isset($info['FIRST_NAME'])) echo 'value='.$info['FIRST_NAME'].''; ?>
+										<?php if (isset($info['FIRST_NAME'])) echo 'value="'.$info['FIRST_NAME'].'"'; ?>
 										style="margin-top:10px; height:25px; width:180px;" required><br>
 					Last Name : <input type="text" name="lname" placeholder="Last Name" maxlength="24"
-										<?php if (isset($info['LAST_NAME'])) echo 'value='.$info['LAST_NAME'].''; ?>
+										<?php if (isset($info['LAST_NAME'])) echo 'value="'.$info['LAST_NAME'].'"'; ?>
 										style="margin-top:10px; height:25px; width:180px;" required><br>
 					Address : <input type="text" name="address" placeholder="Address" maxlength="128"
-										<?php if (isset($info['ADDRESS'])) echo 'value='.$info['ADDRESS'].''; ?>
+										<?php if (isset($info['ADDRESS'])) echo 'value="'.$info['ADDRESS'].'"'; ?>
 										style="margin-top:10px; height:25px; width:180px;"><br>
 					Phone Number : <input type="text" name="phone" placeholder="10 digit phone number" pattern="[0-9]{10}" 
-											<?php if (isset($info['PHONE'])) echo 'value='.$info['PHONE'].''; ?>
+											<?php if (isset($info['PHONE'])) echo 'value="'.$info['PHONE'].'"'; ?>
 											style="margin-top:10px; height:25px; width:180px;"><br>
 					Email : <input type="email" name="email" placeholder="Email" maxlength="128"
-										<?php if (isset($info['EMAIL'])) echo 'value='.$info['EMAIL'].''; ?>
+										<?php if (isset($info['EMAIL'])) echo 'value="'.$info['EMAIL'].'"'; ?>
 										style="margin-top:10px; height:25px; width:180px;"><br>
 
 					<div <?php echo 'style='.(isset($_SESSION["infoErr"]) ? "color:red;" : "color:black;").''; ?>>
@@ -233,11 +232,12 @@
     	<form name="manage" method="get">
     		<!-- Hidden mode value -->
     		<input type="hidden" name="mode" value="manage">
-    		<input type="hidden" name="aid">
+    		<input type="hidden" name="account" id="account">
+    		<input type="hidden" name="pid" id="pid">
     		
     		<!-- Search parameters -->
     		Username : <input type="text" name="usr" placeholder="Username" 
-    		<?php if (isset($_GET['usr']) and $_GET['usr']) {echo 'value='.$_GET['usr'].''; $_GET['fname'] = ''; $_GET['lname'] = '';} ?>
+    		<?php if (isset($_GET['usr']) and $_GET['usr']) echo 'value='.$_GET['usr'].''; ?>
     		style="margin-bottom:10px; height:25px; width:180px;"> 
 			First Name : <input type="text" name="fname" placeholder="First Name" 
 			<?php if (isset($_GET['fname']) and $_GET['fname']) echo 'value='.$_GET['fname'].''; ?>
@@ -251,6 +251,8 @@
     <?php
     	if (isset($_GET['search'])) {
 			obtainUsers($_GET['usr'], $_GET['fname'], $_GET['lname']);
+    	} else if (isset($_GET['account']) and isset($_GET['pid'])) {
+    		userForm($_GET['account'], $_GET['pid']);
     	}
     }
 
@@ -442,16 +444,14 @@
         }
 
         // Sql command
-        $sql = 'SELECT * 
+        $sql = 'SELECT u.user_name, u.class, u.person_id, p.first_name, p.last_name
         				FROM users u, persons p 
         				WHERE u.person_id = p.person_id';
-			if ($usr) {
-				$sql = ''.$sql.' AND LOWER(u.user_name) = \''.strtolower($usr).'\'';
-			}
-			else {
-				if ($fname) $sql = ''.$sql.' AND LOWER(p.first_name) = \''.strtolower($fname).'\'';
-				if ($lname) $sql = ''.$sql.' AND LOWER(p.last_name) = \''.strtolower($lname).'\'';
-			}
+
+			if ($usr) $sql = ''.$sql.' AND LOWER(u.user_name) LIKE \'%'.strtolower($usr).'%\'';
+			if ($fname) $sql = ''.$sql.' AND LOWER(p.first_name) LIKE \'%'.strtolower($fname).'%\'';
+			if ($lname) $sql = ''.$sql.' AND LOWER(p.last_name) LIKE \'%'.strtolower($lname).'%\'';
+		
 			$sql = ''.$sql.' ORDER BY u.user_name'; 
 
         // Prepare sql using conn and returns the statement identifier
@@ -468,22 +468,36 @@
         	// No error
         	// Fetch and output info
         	global $types; 
+        	if ($info = oci_fetch_array($stid)) {
         	?>
-        	<table border="1">
+        		<table border="1">
+        			<th width="100" align="center" valign="middle">Username</th>
+        			<th width="100" align="center" valign="middle">Account Type</th>
+        			<th width="100" align="center" valign="middle">First Name</th>
+        			<th width="100" align="center" valign="middle">Last Name</th>
         	<?php
-        	while ($info = oci_fetch_array($stid)) {
+        		while ($info) {
         		?>
-        			<tr <?php echo 'onclick="alert(\''.$info["USER_NAME"].'\')"'; ?>>
+        			<tr <?php echo 'onclick="selectUser(\''.$info["USER_NAME"].'\', \''.$info["PERSON_ID"].'\')"'; ?>>
 						<td><?php echo $info["USER_NAME"]; ?></td>	
 						<td><?php echo $types[$info["CLASS"]]; ?></td>
 						<td><?php echo $info["FIRST_NAME"]; ?></td>
 						<td><?php echo $info["LAST_NAME"]; ?></td>	
 					</tr>
         		<?php
-			}
+        			$info = oci_fetch_array($stid);
+				}
 			?>
-			</table>
+				</table>
 			<?php
+			} else {
+				// Error message for having no matching results
+			?>
+				<div style="color:red;">
+					No matching results
+				</div>		
+			<?php
+			}
         }
         	
         // Free the statement identifier when closing the connection
@@ -549,6 +563,12 @@
 	// Switches mode value
 	function switchMode(mode) {
 		document.getElementById('mode').value = mode;
+	}
+
+	function selectUser(user_name, person_id) {
+		document.getElementById('account').value = user_name;
+		document.getElementById('pid').value = person_id;
+		document.forms['manage'].submit()
 	}
 
 	function updateDiagnosisList(event) {

@@ -23,6 +23,7 @@
 		</form>
 	<?php
 	}
+
 	// Creates forms for the account and person info of specified username which can be editted (called when mode == account)
     function userForm($usr, $pid) {	
         // Establish connection
@@ -31,6 +32,7 @@
             $e = oci_error();
             trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
         }
+
    		// Try to update info if previous request was made
     	if (isset($_POST["saveInfo"])) updateInfo($usr, $pid);
 		else if (isset($_POST["savePwd"])) updatePwd($usr);
@@ -39,10 +41,13 @@
         $sql = 'SELECT u.user_name, p.person_id, u.class, p.first_name, p.last_name, p.address, p.phone, p.email  
         		FROM users u, persons p 
         		WHERE u.user_name = \''.$usr.'\' AND p.person_id = '.$pid.'';
-        // Prepare sql using conn and returns the statement identifier
+
+        // Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql);
-        // Execute a statement returned from oci_parse()
+
+        // Execute a statement returned from oci_parse()
         $res = oci_execute($stid);
+
         if (!$res) {
         	// Error, retrieve the error using the oci_error() function & output an error message
      	   	$err = oci_error($stid);
@@ -51,8 +56,10 @@
         	// No error
         	// Fetch info matching usr (should be unique)
         	$info = oci_fetch_array($stid);
+
         	// Retrieve types
         	global $types;
+
         	if ($info) {
 			?>
 				<h1>
@@ -60,7 +67,7 @@
 	        	</h1>
 
 	        	<!-- -->
-				<form name="info" method="post" action="account.php?mode=account">
+				<form name="info" method="post">
 					<!-- Create a selection for account types -->
 					Account Type : <select name = "class">
 	    								<?php
@@ -137,6 +144,7 @@
 				echo "Account doesn't exist anymore";
 			}
         }
+
         // Free the statement identifier when closing the connection
         oci_free_statement($stid);
         oci_close($conn);
@@ -198,11 +206,13 @@
 			$search = implode(" ", $_GET["key"]);
 			$sdate = stringToDate($_GET["sdate"]);
 			$edate = stringToDate($_GET["edate"]);
+
 			if ($search or $sdate or $edate) { 
 				// Valid search string or date objects
 				echo 'Search results for:<br>', ($search ? 'Keyword(s): '.$search.'<br>' : ''), 
 						($sdate ? 'Start Date: '.dateToString($sdate).' '.($edate ? '' : '<br>').'' : ''), 
 						($edate ? 'End Date: '.dateToString($edate).'<br>': '');
+
 				// Call search_keyword with search string and formatted date strings (null if not it was not a valid date to begin with)
 				search_keyword($search, ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null));
 			} else {
@@ -215,6 +225,7 @@
 			}
 		}
     }
+
 	// Creates form for managing users
     function manageForm() {
     ?>
@@ -244,6 +255,7 @@
     		userForm($_GET['account'], $_GET['pid']);
     	}
     }
+
    	// Creates form for generating a report
     function generateForm() {
     ?>
@@ -261,6 +273,7 @@
 		?> 
 			onkeyup="updateDiagnosisList(event)" autocomplete="off" required>
 	    	<datalist id="diagnosisList"></datalist>
+	    	
 
 			<!-- Start of date range for test date -->
 			Start Date : <input type="date" name="sdate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}" 
@@ -285,6 +298,7 @@
 			<input type="submit" name="generate" value="Generate" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
 		</form>
 		
+		
     <?php
 		if (isset($_GET['generate'])) {
 			$sdate = stringToDate($_GET["sdate"]);
@@ -293,6 +307,8 @@
 			report_generating($_GET['diagnosis'], ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null));
     	}
     }
+
+   	// Creates form for data analysis
    	// Creates form for data analysis
     function analysisForm() {
     ?>
@@ -336,13 +352,15 @@
 			
 			<input type="submit" name="analysis" value="Analysis" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
     	</form>
-    	    <?php
+    <?php
     	if (isset($_GET['analysis'])) {
 			//data_analysis($_GET['fname'], $_GET['lname'], $_GET['test_type'],($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null));
 			echo 'information : ',$_GET['fname'];
 			echo 'information : ',$_GET['sdate'];
     	}
+   
     }
+
     // Creates form for logging out
     function logoutForm() {
     ?>
@@ -351,6 +369,7 @@
 		</form>
     <?php
     }
+
     // Updates an account
     function updateInfo($usr, $pid) {
     	// Establish connection
@@ -359,40 +378,51 @@
             $e = oci_error();
             trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
         }
+
         // Sql command
         $sql = 'UPDATE users 
         		SET class = \''.$_POST["class"].'\' 
         		WHERE user_name = \''.$usr.'\'';
-        // Prepare sql using conn and returns the statement identifier
+
+        // Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql);
-        // Execute a statement returned from oci_parse()
+
+        // Execute a statement returned from oci_parse()
         $res1 = oci_execute($stid);
+
 		if (!$res1) {
 	        	// Error, retrieve the error using the oci_error() function & output an error message
 	     	   	$err = oci_error($stid);
 	     	   	echo htmlentities($err['message']);
 	        }
+
 		// Sql command
         $sql = 'UPDATE persons
         		SET first_name = \''.$_POST["fname"].'\', last_name =  \''.$_POST["lname"].'\',
         			address = \''.$_POST["address"].'\', phone =  \''.$_POST["phone"].'\',
         			email = \''.$_POST["email"].'\'
         		WHERE person_id = \''.$pid.'\'';
-        // Prepare sql using conn and returns the statement identifier
+
+        // Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql);
-        // Execute a statement returned from oci_parse()
+
+        // Execute a statement returned from oci_parse()
         $res2 = oci_execute($stid);
+
 		if (!$res2) {
         	// Error, retrieve the error using the oci_error() function & output an error message
      	   	$err = oci_error($stid);
      	   	echo htmlentities($err['message']);
         }
+
         if ($res1 and $res2) $_SESSION["infoMsg"] = "Update successful";
         else $_SESSION["infoErr"] = "An error occured";
+
         // Free the statement identifier when closing the connection
         oci_free_statement($stid);
         oci_close($conn);
     }
+
     function updatePwd($usr) {
     	if ($_POST["npwd"] == $_POST["cpwd"]) {
     		// New password confirmed
@@ -402,12 +432,16 @@
 	            $e = oci_error();
 	            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
 	        }
+
 	        // Sql command
 	        $sql = 'SELECT * FROM users WHERE LOWER(user_name) = \''.strtolower($usr).'\'';
-	        // Prepare sql using conn and returns the statement identifier
+
+	        // Prepare sql using conn and returns the statement identifier
 	        $stid = oci_parse($conn, $sql);
-	        // Execute a statement returned from oci_parse()
+
+	        // Execute a statement returned from oci_parse()
 	        $res = oci_execute($stid);
+
 	        if (!$res) {
 	        	// Error, retrieve the error using the oci_error() function & output an error message
 	     	   	$err = oci_error($stid);
@@ -423,10 +457,13 @@
 	       	 		$sql = 'UPDATE users 
         					SET password = \''.$_POST["cpwd"].'\' 
         					WHERE user_name = \''.$usr.'\'';
-			        // Prepare sql using conn and returns the statement identifier
+
+			        // Prepare sql using conn and returns the statement identifier
 			        $stid = oci_parse($conn, $sql);
-			        // Execute a statement returned from oci_parse()
+
+			        // Execute a statement returned from oci_parse()
 			        $res = oci_execute($stid);
+
 			        if (!$res) {
 	        			// Error, retrieve the error using the oci_error() function & output an error message
 	     	   			$err = oci_error($stid);
@@ -456,18 +493,22 @@
             $e = oci_error();
             trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
         }
+
         // Sql command
         $sql = 'SELECT u.user_name, u.class, u.person_id, p.first_name, p.last_name
         				FROM users u, persons p 
         				WHERE u.person_id = p.person_id';
+
 			if ($usr) $sql = ''.$sql.' AND LOWER(u.user_name) LIKE \'%'.strtolower($usr).'%\'';
 			if ($fname) $sql = ''.$sql.' AND LOWER(p.first_name) LIKE \'%'.strtolower($fname).'%\'';
 			if ($lname) $sql = ''.$sql.' AND LOWER(p.last_name) LIKE \'%'.strtolower($lname).'%\'';
 		
 			$sql = ''.$sql.' ORDER BY u.user_name'; 
-        // Prepare sql using conn and returns the statement identifier
+
+        // Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql);
-        // Execute a statement returned from oci_parse()
+
+        // Execute a statement returned from oci_parse()
         $res = oci_execute($stid);
         
         if (!$res) {
@@ -480,25 +521,28 @@
         	global $types; 
         	if ($info = oci_fetch_array($stid)) {
         	?>
-        		<table border="1">
-        			<th width="100" align="center" valign="middle">Username</th>
-        			<th width="100" align="center" valign="middle">Account Type</th>
-        			<th width="100" align="center" valign="middle">First Name</th>
-        			<th width="100" align="center" valign="middle">Last Name</th>
-        	<?php
-        		while ($info) {
-        		?>
-        			<tr <?php echo 'onclick="selectUser(\''.$info["USER_NAME"].'\', \''.$info["PERSON_ID"].'\')"'; ?>>
-						<td><?php echo $info["USER_NAME"]; ?></td>	
-						<td><?php echo $types[$info["CLASS"]]; ?></td>
-						<td><?php echo $info["FIRST_NAME"]; ?></td>
-						<td><?php echo $info["LAST_NAME"]; ?></td>	
-					</tr>
-        		<?php
-        			$info = oci_fetch_array($stid);
-				}
-			?>
-				</table>
+        		<div style="height:500px; width:intrinsic; overflow:auto;">
+	        		<table border="1">
+	        			<th width="100" align="center" valign="middle">Username</th>
+	        			<th width="100" align="center" valign="middle">Type</th>
+	        			<th width="100" align="center" valign="middle">First Name</th>
+	        			<th width="100" align="center" valign="middle">Last Name</th>
+	        	<?php
+	        		while ($info) {
+	        		?>
+	        			<tr <?php echo 'onclick="selectUser(\''.$info["USER_NAME"].'\', \''.$info["PERSON_ID"].'\')"'; ?>
+	        				onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'">
+							<td><?php echo $info["USER_NAME"]; ?></td>	
+							<td align="center" valign="middle"><?php echo $types[$info["CLASS"]]; ?></td>
+							<td><?php echo $info["FIRST_NAME"]; ?></td>
+							<td><?php echo $info["LAST_NAME"]; ?></td>	
+						</tr>
+	        		<?php
+	        			$info = oci_fetch_array($stid);
+					}
+				?>
+					</table>
+				</div>
 			<?php
 			} else {
 				// Error message for having no matching results
@@ -519,10 +563,12 @@
     function stringToDate($date) {
     	return DateTime::createFromFormat('Y-m-j', $date);
     }
+
     // Convert date object to formatted string
     function dateToString($date) {
     	return date_format($date,"j-M-Y");
     }
+
     // Returns an array of all the types of diagnosis
     function diagnosisArray() {
     	// Establish connection
@@ -531,22 +577,28 @@
             $e = oci_error();
             trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
         }
+
         // Sql command
         $sql = 'SELECT DISTINCT UPPER(diagnosis) FROM radiology_record
         		ORDER BY UPPER(diagnosis)';
-        // Prepare sql using conn and returns the statement identifier
+
+        // Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql);
-        // Execute a statement returned from oci_parse()
+
+        // Execute a statement returned from oci_parse()
         $res = oci_execute($stid);
+
         $diagnosisArray = array();
         if ($res) {
 	        while ($row = oci_fetch_array($stid)) {
 	        	array_push($diagnosisArray, $row["UPPER(DIAGNOSIS)"]);
 	        }
 		}	
+
         // Free the statement identifier when closing the connection
         oci_free_statement($stid);
         oci_close($conn);
+
         return $diagnosisArray;
     }
 ?>
@@ -554,30 +606,37 @@
 <script>
 	// Set up a global variable for diagnosisArray
 	var diagnosisArray = new array(); 
+
 	// Adds another text input into the dynamic list of keywords
 	function addKeyword() {
 		var newdiv = document.createElement('div');
 		newdiv.innerHTML = '<input type="text" name="key[]" style="margin-bottom:1px; height:25px; width:180px;"><br>';
 		document.getElementById('keywordsList').appendChild(newdiv);
 	}			
+
 	// Switches mode value
 	function switchMode(mode) {
 		document.getElementById('mode').value = mode;
 	}
+
 	function selectUser(user_name, person_id) {
 		document.getElementById('account').value = user_name;
 		document.getElementById('pid').value = person_id;
 		document.forms['manage'].submit()
 	}
+
 	function updateDiagnosisList(event) {
 		// Grab keycode
 		var x = event.which || event.keyCode;
+
 		if ((x < 37 || x > 40)) {
 			// Don't do anything on arrow key events
 			// Retrieve diagnosisList element
 			var list = document.getElementById('diagnosisList');
+
 			// Empty the list
 			list.innerHTML = '';
+
 			// Retrieve list of diagnosis
 			if (!diagnosisArray) {
 				// Assign diagnosisArray for the first time
@@ -586,19 +645,24 @@
 						echo json_encode(diagnosisArray()); 
 					?>;
 			}
+
 			// Filter diagnosisArray into newArray
 			var newArray = diagnosisArray.filter(isLike);
+
 			// Sort newArray
 			newArray.sort(isFirst);
+
 			// Show only up to the first 10 results
 			for(var i=0;i<newArray.length && i < 10;i++){
 				list.innerHTML += '<option>'+newArray[i]+'<option>';
 	    	}
 	    }
 	}
+
 	function isLike(element) {
 		// Obtain current diagnosis value
 		var diagnosis = document.getElementById('diagnosis');
+
 		if (diagnosis.value) {
 			// There is a value to filter by
 			// Show elements that contain the value
@@ -608,9 +672,11 @@
 	  		return false;
 	  	}
 	}
+
 	function isFirst(a, b) {
 		// Obtain current diagnosis value
 		var diagnosis = document.getElementById('diagnosis');
+
 		if (diagnosis.value) {
 			// There is a value to sort by
 	  		return a.toLowerCase().indexOf(diagnosis.value.toLowerCase()) - b.toLowerCase().indexOf(diagnosis.value.toLowerCase());

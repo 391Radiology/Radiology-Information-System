@@ -233,6 +233,7 @@
     	<form name="manage" method="get">
     		<!-- Hidden mode value -->
     		<input type="hidden" name="mode" value="manage">
+    		<input type="hidden" name="aid">
     		
     		<!-- Search parameters -->
     		Username : <input type="text" name="usr" placeholder="Username" 
@@ -466,9 +467,23 @@
         } else {
         	// No error
         	// Fetch and output info
+        	global $types; 
+        	?>
+        	<table border="1">
+        	<?php
         	while ($info = oci_fetch_array($stid)) {
-				echo ''.$info["USER_NAME"].' '.$info["FIRST_NAME"].' '.$info["LAST_NAME"].' <br>';        	
+        		?>
+        			<tr <?php echo 'onclick="alert(\''.$info["USER_NAME"].'\')"'; ?>>
+						<td><?php echo $info["USER_NAME"]; ?></td>	
+						<td><?php echo $types[$info["CLASS"]]; ?></td>
+						<td><?php echo $info["FIRST_NAME"]; ?></td>
+						<td><?php echo $info["LAST_NAME"]; ?></td>	
+					</tr>
+        		<?php
 			}
+			?>
+			</table>
+			<?php
         }
         	
         // Free the statement identifier when closing the connection

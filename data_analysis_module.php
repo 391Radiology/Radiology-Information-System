@@ -1,6 +1,6 @@
 <?php
 	//$date has three options:"Weekly", "Monthly" or "Weekly"
- 	function data_analysis($patient,$date,$test_type){
+ 	function data_analysis($patient,$sdate,$edate,$test_type){
 	 	$conn=connect();
 			if (!$conn) {
   			$e = oci_error();
@@ -21,10 +21,10 @@
 	//Create sql part by part
 	
 	 	
-		$sql = ’SELECT’;
+		$sql = 'SELECT';
 		//set up which factor to choose
 		if(!empty($patient)){
-			$sql = $sql.’i.FIRST_NAME, i.LAST_NAME’;
+			$sql = $sql.'i.FIRST_NAME, i.LAST_NAME';
 			echo '<th> First Name </th>';
             		echo '<th> Last Name </th>';
 		}
@@ -50,18 +50,18 @@
 				}
 				*/
 			
-			echo ‘<th> Date </th>’;
+			echo '<th> Date </th>';
 
 		}
 		if (!empty($test_type)){
-			$sql = $sql.’TEST_TYPE’;
-			echo ‘<th> Test Type </th>’
+			$sql = $sql.'TEST_TYPE';
+			echo '<th> Test Type </th>'
 		}
-		$sql.=’COUNT(image_id)’;
-		$sql.=’FROM Information_for_data_analysis i’;
-		$sql.=’GROUP BY’;
+		$sql.='COUNT(image_id)';
+		$sql.='FROM Information_for_data_analysis i';
+		$sql.='GROUP BY';
 		if(!empty($patient)){
-			$sql = $sql.’FIRST_NAME, LAST_NAME’;
+			$sql = $sql.'FIRST_NAME, LAST_NAME';
 
 		}
 		if (!empty($date)){
@@ -87,11 +87,11 @@
 				*/
 			
 
-			//$sql = $sql.’TEST_DATE’;
+			//$sql = $sql.'TEST_DATE';
 
 		}
 		if (!empty($test_type)){
-			$sql = $sql.’TEST_TYPE’;
+			$sql = $sql.'TEST_TYPE';
 		}
 		
 
@@ -102,9 +102,9 @@
 	 	$res=oci_execute($stid);
 	 	while (($row = oci_fetch_array($stid, OCI_ASSOC))) {
 			foreach ($row as $item) {
-				echo ‘<td>’;
+				echo '<td>';
 				echo $item;
-				echo ‘</td>’;
+				echo '</td>';
 
 			
 			
@@ -115,6 +115,7 @@
 	 	}
  	}
 ?>
+
 
 
 

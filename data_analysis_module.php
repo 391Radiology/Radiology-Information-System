@@ -1,6 +1,6 @@
 <?php
 	//$date has three options:"Weekly", "Monthly" or "Weekly"
- 	function data_analysis($fname,$lname,$test_type,$sdate,$edate){
+ 	function data_analysis($fname,$lname,$test_type,$sdate,$edate,$timeperiod){
 	 	$conn=connect();
 			if (!$conn) {
   			$e = oci_error();
@@ -18,17 +18,41 @@
 		$stid = oci_parse($conn, $sql);
 
 		$res = oci_execute($stid);
+		/*
+		echo 'test=========== : ',$_GET['timeperiod'];
+		if($_GET['sdate']<$_GET['edate']) {
+			echo $sdate,'<br>';
+			echo 'test===========success : ';
+			echo '<td><?php echo $info["TEST_DATE"]; ?></td>	';
+			};
+		//echo 'test=========== : ',$_GET['sdate'];
+		//echo 'test=========== : ',$_GET['edate'];
+		*/
+		
+		$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,i.image_count
+			    FROM Information_for_data_analysis i ';
+			    // WHERE i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' 
+			     
+		echo 'SQL is =========== : ',$sql, '<br>';
+		
+		/*
+		if($_GET['sdate']<$_GET['edate']) {
+			echo 'test===========success : ';
+			echo '<td><?php echo $info["TEST_DATE"]; ?></td>	';
+			};
+		echo 'test=========== : ',$_GET['sdate'];
+		echo 'test=========== : ',$_GET['edate'];
+		*/
 		
 		
-
 		
-		//r.test_date >= \''.$sdate.'\' AND r.test_date <= \''.$edate.'\'
+		/*
+		
 		$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,i.image_count
 			    FROM Information_for_data_analysis i
 			     ';
 			     
 
-		
 	
 		
 		
@@ -68,8 +92,7 @@
 
 					
 			
-			//echo'<th> one not empty</th>';
-
+		*/
 		
 
 		

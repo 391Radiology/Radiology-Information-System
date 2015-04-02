@@ -341,6 +341,7 @@
 							?> 
 							
 								style="margin-bottom:10px; height:25px; width:180px;">
+								
 
 			<!-- End of date range for test date -->
 			
@@ -351,24 +352,28 @@
 									echo 'value=', $_GET['edate'];	
 								}
 							?> 
-								style="margin-bottom:10px; height:25px; width:180px;">		
-									<label id="timeperiodlabel" for="timeperiod:">Time Period: </label><select name="timeperiod" id="timeperiod">
+								style="margin-bottom:10px; height:25px; width:180px;"><br>
+								
+						<label id="timeperiodlabel" for="timeperiod:">Time Period: </label><select name="timeperiod" id="timeperiod">
 	        					<option value="w">Weekly</option>
     	    						<option value="m">Monthly</option>
     	    						<option value="y">Yearly</option>
     						</select></br></br>
 			
+			
 			<input type="submit" name="analysis" value="Analysis" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
     	</form>
     <?php
     	if (isset($_GET['analysis'])) {
-			data_analysis($_GET['fname'], $_GET['lname'], $_GET['test_type'],($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null));
+    		$sdate = stringToDate($_GET["sdate"]);
+			$edate = stringToDate($_GET["edate"]);
+			//echo 'value!!!!!!!!!!!!!!!=', $_GET['timeperiod'];	
+			data_analysis($_GET['fname'], $_GET['lname'], $_GET['test_type'],($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null),$_GET['timeperiod']);
 			echo 'information : ',$_GET['fname'];
 			echo 'information : ',$_GET['sdate'];
     	}
    
     }
-
     // Creates form for logging out
     function logoutForm() {
     ?>

@@ -33,7 +33,7 @@
         	echo 'Results for:<br>Diagnosis: '.$diagnosis.'<br>Start Date: '.$sdate.' End Date: '.$edate.'<br>';
         	if ($info = oci_fetch_array($stid)) {
         	?>
-        		<div style="height:500px; width:intrinsic; overflow:auto;">
+        		<div style="height:600px; width:intrinsic; overflow:auto;">
 	        		<table border="1">
 	        		<th width="100" align="center" valign="middle">First Name</th>
 	        		<th width="100" align="center" valign="middle">Last Name</th>

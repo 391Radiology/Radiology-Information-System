@@ -12,14 +12,19 @@
        	//$edate = DateTime::createFromFormat('Y-m-j', $edate);
 					
 			//implement KEYWORD /compsci/webdocs/zioueche/web_doc
-			$sql = 'SELECT 6*(score(1)+score(2))+3*score(3)+score(4) as rank, p.first_name, p.last_name, test_date, test_type, r.record_id as rid 
+			if (!$keyWord){
+				$sql = 'SELECT p.first_name, p.last_name, test_date, test_type, r.record_id as rid
+						FROM radiology_record r, persons p
+						WHERE p.person_id = r.patient_id';
+				}
+			else {$sql = 'SELECT 6*(score(1)+score(2))+3*score(3)+score(4) as rank, p.first_name, p.last_name, test_date, test_type, r.record_id as rid
 						FROM radiology_record r, persons p
 						WHERE p.person_id = r.patient_id 
 						AND (contains(first_name, \'%s\', 1)>0 
 						OR contains(last_name, \'%s\', 2) > 0 
 						OR contains(diagnosis, \'%s\', 3) > 0 
 						OR contains(description, \'%s\', 4) > 0
-						)';
+						)';}
 			
 			if ($sdate) $sql =' '.$sql.' AND test_date >= \''.$sdate.'\'';		
 			if ($edate) $sql = ' '.$sql.' AND test_date <= \''.$edate.'\'';
@@ -33,6 +38,7 @@
 			$sql2 = sprintf($sql, $keyWord,$keyWord,$keyWord,$keyWord);
 			$sql = $sql2.$rest_of_query;		
 			?>
+			<div style="display: inline-block; height:600px; overflow:auto;">
 			<table border="1" class="clickable-row" >
 				<th align='center' valign='middle' width='100'>Result</th>
 				<th align='center' valign='middle' width='100'>DEBUG ONLY</th>
@@ -53,52 +59,74 @@
             $err = oci_error($stid);
             echo htmlentities($err['message']);
         } else {
-        		$pos = 1;
+        		$pos = 0;
         		//$part1 = $_SERVER['REQUEST_URI'];
         		//$part2 = $_SERVER['QUERY_STRING'];
         		//echo $_SERVER['REQUEST_URI'];
-            while ($record = oci_fetch_array($stid)) {	
+            while ($record = oci_fetch_array($stid)) {
+            	$pos += 1;	
             ?>
             
-					<tr>
-					<td align='center' valign='middle'><?php echo $pos ?></td>
-               <td ><?php echo $record["RANK"] ?></td>
-               <td ><?php echo $record["FIRST_NAME"] ?></td>
-               <td ><?php echo $record["LAST_NAME"] ?></td>
-               <td align='center' valign='middle'><?php echo $record["TEST_DATE"] ?></td>
-               <td ><?php echo $record["TEST_TYPE"] ?></td>
-               <td ><?php echo $record["RID"] ?></td>
+					<tr onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'">
+					<td align='center' valign='middle'<?php echo 'onclick="selectRecord(\''.$record["RID"].'\')"'; ?>
+	        				><?php echo $pos ?></td>
+               <td <?php echo 'onclick="selectRecord(\''.$record["RID"].'\')"'; ?>
+	        				><?php echo $record["RANK"] ?></td>
+               <td <?php echo 'onclick="selectRecord(\''.$record["RID"].'\')"'; ?>
+	        				><?php echo $record["FIRST_NAME"] ?></td>
+               <td <?php echo 'onclick="selectRecord(\''.$record["RID"].'\')"'; ?>
+	        				><?php echo $record["LAST_NAME"] ?></td>
+               <td align='center' valign='middle' <?php echo 'onclick="selectRecord(\''.$record["RID"].'\')"'; ?>
+	        				><?php echo $record["TEST_DATE"] ?></td>
+               <td <?php echo 'onclick="selectRecord(\''.$record["RID"].'\')"'; ?>
+	        				><?php echo $record["TEST_TYPE"] ?></td>
+               <td <?php echo 'onclick="selectRecord(\''.$record["RID"].'\')"'; ?>
+	        				><?php echo $record["RID"] ?></td>
                <?php
               
-               $sql = 'SELECT thumbnail as tb, image_id as id 
+               $sql = 'SELECT pc.thumbnail, pc.image_id 
                			FROM pacs_images pc
                			WHERE pc.record_id = '.$record["RID"];
-               			
+               
                $test = oci_parse($conn, $sql);
                $result = oci_execute($test);
-               if (!$res) {
+               if (!$result) {
             		$err = oci_error($stid);
             		echo htmlentities($err['message']);
-            	
-
-
-       			 } else{			
+						
+       			 } else{	
+       			 //echo $sql."<br>";		
        			 ?>	
-       			 		<td >
+					  		<td> 	 
+       			 <?php if ($row = oci_fetch_array($test)){
+       			 	while ($row){
+       				 ?>
        			 		<a href="index.jpeg" target="_Blank">
     						<img src="index.jpeg" alt="Put something more exciting here." width="32" height="32" />
 							</a>
-							<?php echo "hello" ?></td>
-							
-					<?php
-               echo "</tr>";
-               $pos += 1;
+							<a href="Ball_python_lucy.JPG" target="_Blank" >
+							<img src="Ball_python_lucy.JPG" alt="Put something more exciting here." width="32" height="32" />
+
+
+						<?php
+						$row = oci_fetch_array($test);
+							}}
+					else{
+						echo "No images available for viewing";					
+						}
+							?>
+					</td>
+               
+               </tr>
+               <?php
             }
+            
 
             }
             ?>
+            
              </table>
-             
+             </div>
              <?php
         // Free the statement identifier when closing the connection
         oci_free_statement($stid);
@@ -113,4 +141,9 @@ function openWin(img) {
 	window.open(img);
 
 }
+function selectRecord(RID) {
+		document.getElementById('rid').value = RID;
+		//alert("HI");
+		document.forms['search'].submit();
+	}
 </script>

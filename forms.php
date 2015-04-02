@@ -144,9 +144,10 @@
     function searchForm() {
     ?>
     	<form name="search" method="get">
-    		<!-- Hidden mode value -->
+    		<!-- Hidden values -->
     		<input type="hidden" name="mode" value="search">
-
+    		<input type="hidden" name="rid" id="rid">
+    		
     		<!-- Start of date range for test date -->
 			Start Date : <input type="date" name="sdate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}" 
 							<?php
@@ -412,7 +413,7 @@
         	global $types; 
         	if ($info = oci_fetch_array($stid)) {
         	?>
-        		<div style="display: inline-block; height:500px; overflow:auto;">
+        		<div style="display: inline-block; height:600px; overflow:auto;">
 	        		<table border="1">
 	        			<th width="100" align="center" valign="middle">Username</th>
 	        			<th width="100" align="center" valign="middle">Type</th>

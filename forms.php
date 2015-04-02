@@ -5,14 +5,15 @@
 	include_once("report_generating_module.php");
 	include_once("dates_manager.php");
 	include_once("data_analysis_module.php");
+	include_once("updates.php");	
 	
 	// Establish global types array
 	$types = array(
 			'a' => 'Admin',
 			'd' => 'Doctor',
 			'r' => 'Radiologist',
-			'p' => 'Patient');
-
+			'p' => 'Patient');	
+	
 	// Creates forms for the account and person info of specified username which can be editted (called when mode == account)
     function userForm($usr, $pid) {	
         // Establish connection
@@ -166,6 +167,19 @@
 							?> 
 								style="margin-bottom:10px; height:25px; width:180px;">
 
+
+			<label id="sortBy" name="sort">Sort by : </label>
+			<select id="sortBy">
+	        					<option value="w">Test Date</option>
+    	    						<option value="m">Relevance</option>
+    		</select>
+    		
+			<label id="orderBy" name="order">Order by : </label>
+			<select id="orderBy">
+	        					<option value="w">Ascending</option>
+    	    						<option value="m">Descending</option>
+    		</select>
+    		
 			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
 
 			<!-- Dynamic list of keywords -->
@@ -203,7 +217,7 @@
 						($edate ? 'End Date: '.dateToString($edate).'<br>': '');
 
 				// Call search_keyword with search string and formatted date strings (null if not it was not a valid date to begin with)
-				search_keyword($search, ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null));
+				search_keyword($search, ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null), 0, 0);
 			} else {
 				// Error message for having no valid search parameters
 			?>
@@ -361,122 +375,6 @@
     		<input type="submit" name="logout" value="Logout">	
 		</form>
     <?php
-    }
-
-    // Updates an account
-    function updateInfo($usr, $pid) {
-    	// Establish connection
-        $conn = connect();
-        if (!$conn) {
-            $e = oci_error();
-            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
-        }
-
-        // Sql command
-        $sql = 'UPDATE users 
-        		SET class = \''.$_POST["class"].'\' 
-        		WHERE user_name = \''.$usr.'\'';
-
-        // Prepare sql using conn and returns the statement identifier
-        $stid = oci_parse($conn, $sql);
-
-        // Execute a statement returned from oci_parse()
-        $res1 = oci_execute($stid);
-
-		if (!$res1) {
-	        	// Error, retrieve the error using the oci_error() function & output an error message
-	     	   	$err = oci_error($stid);
-	     	   	echo htmlentities($err['message']);
-	        }
-
-		// Sql command
-        $sql = 'UPDATE persons
-        		SET first_name = \''.$_POST["fname"].'\', last_name =  \''.$_POST["lname"].'\',
-        			address = \''.$_POST["address"].'\', phone =  \''.$_POST["phone"].'\',
-        			email = \''.$_POST["email"].'\'
-        		WHERE person_id = \''.$pid.'\'';
-
-        // Prepare sql using conn and returns the statement identifier
-        $stid = oci_parse($conn, $sql);
-
-        // Execute a statement returned from oci_parse()
-        $res2 = oci_execute($stid);
-
-		if (!$res2) {
-        	// Error, retrieve the error using the oci_error() function & output an error message
-     	   	$err = oci_error($stid);
-     	   	echo htmlentities($err['message']);
-        }
-
-        if ($res1 and $res2) $_SESSION["infoMsg"] = "Update successful";
-        else $_SESSION["infoErr"] = "An error occured";
-
-        // Free the statement identifier when closing the connection
-        oci_free_statement($stid);
-        oci_close($conn);
-    }
-
-    function updatePwd($usr) {
-    	if ($_POST["npwd"] == $_POST["cpwd"]) {
-    		// New password confirmed
-	    	// Establish connection
-	        $conn = connect();
-	        if (!$conn) {
-	            $e = oci_error();
-	            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
-	        }
-
-	        // Sql command
-	        $sql = 'SELECT * FROM users WHERE LOWER(user_name) = \''.strtolower($usr).'\'';
-
-	        // Prepare sql using conn and returns the statement identifier
-	        $stid = oci_parse($conn, $sql);
-
-	        // Execute a statement returned from oci_parse()
-	        $res = oci_execute($stid);
-
-	        if (!$res) {
-	        	// Error, retrieve the error using the oci_error() function & output an error message
-	     	   	$err = oci_error($stid);
-	     	   	echo htmlentities($err['message']);
-	        } else {
-	        	// No error
-        		// Fetch account matching usr (should be unique)
-        		$account = oci_fetch_array($stid);
-	        	
-	        	if ($account and $_POST["opwd"] == $account["PASSWORD"]) {
-	        		// Account still exists and old password matches account password
-	        		// Sql command
-	       	 		$sql = 'UPDATE users 
-        					SET password = \''.$_POST["cpwd"].'\' 
-        					WHERE user_name = \''.$usr.'\'';
-
-			        // Prepare sql using conn and returns the statement identifier
-			        $stid = oci_parse($conn, $sql);
-
-			        // Execute a statement returned from oci_parse()
-			        $res = oci_execute($stid);
-
-			        if (!$res) {
-	        			// Error, retrieve the error using the oci_error() function & output an error message
-	     	   			$err = oci_error($stid);
-	     	   			echo htmlentities($err['message']);
-	        		} else {
-	        			$_SESSION["pwdMsg"] = "Password changed";
-	        		}
-	        	} else {
-	        		// Old password doesn't match account password
-	        		$_SESSION["pwdErr"] = "Incorrect password";
-	        	}
-	        }
-	        
-	        // Free the statement identifier when closing the connection
-	        oci_free_statement($stid);
-	        oci_close($conn);
-	    } else {
-	    	// New password not confirmed
-	    	$_SESSION["pwdErr"] = "Passwords do not match";
-	    }
     }
 	
 	 function obtainUsers($usr, $fname, $lname) {

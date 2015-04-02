@@ -41,7 +41,6 @@
                 // Account was found, save account id and type in session
                 $_SESSION["usr"] = $account["USER_NAME"];
                 $_SESSION["pid"] = $account["PERSON_ID"];
-                $_SESSION["type"] = $account["CLASS"];
             }
         }
 

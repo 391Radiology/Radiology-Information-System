@@ -1,6 +1,6 @@
 <?php
   	 include_once("PHPconnectionDB.php");
-    function search_keyword($keyWord, $sdate, $edate){        	
+    function search_keyword($keyWord, $sdate, $edate, $sortBy, $orderBy){        	
         //establish connection
         $conn = connect();
         if (!$conn) {
@@ -23,8 +23,11 @@
 			
 			if ($sdate) $sql =' '.$sql.' AND test_date >= \''.$sdate.'\'';		
 			if ($edate) $sql = ' '.$sql.' AND test_date <= \''.$edate.'\'';
+			if ($sortBy) $rest_of_query = ' ORDER BY (6*(score(1)+score(2))+3*score(3)+score(4))';
+			else $rest_of_query = 'order by test_date';
+			if ($orderBy) $rest_of_query = $rest_of_query."ASC";
+			else $rest_of_query = $rest_of_query."DESC";
 			
-			$rest_of_query = ' ORDER BY (6*(score(1)+score(2))+3*score(3)+score(4))';
 			$sql2 = sprintf($sql, $keyWord,$keyWord,$keyWord,$keyWord);
 			$sql = $sql2.$rest_of_query;		
 			?>
@@ -38,7 +41,7 @@
 				<th align='center' valign='middle' width='100'>Test Date</th>
 				<th align='center' valign='middle' width='100'>Test Type</th>
 				<th align='center' valign='middle' width='100'>Record</th>
-				<th align='center' valign='middle' width='100'>Images</th>
+				<th align='center' valign='middle' >Images</th>
 
 		<?php
 			//prep connection
@@ -55,42 +58,59 @@
         		//$part2 = $_SERVER['QUERY_STRING'];
         		//echo $_SERVER['REQUEST_URI'];
             while ($record = oci_fetch_array($stid)) {	
-					echo "<tr>";
-					echo "<td align='center' valign='middle'>".$pos."</td>";
-               echo "<td >".$record["RANK"]."</td>";
-               echo "<td>".$record["FIRST_NAME"]."</td>";
-               echo "<td>".$record["LAST_NAME"]."</td>";
-               echo "<td align='center' valign='middle'>".$record["TEST_DATE"]."</td>";
-               echo "<td>".$record["TEST_TYPE"]."</td>";
-               echo "<td>".$record["RID"]."<td>";
+            ?>
+            
+					<tr>
+					<td align='center' valign='middle'><?php echo $pos ?></td>
+               <td ><?php echo $record["RANK"] ?></td>
+               <td ><?php echo $record["FIRST_NAME"] ?></td>
+               <td ><?php echo $record["LAST_NAME"] ?></td>
+               <td align='center' valign='middle'><?php echo $record["TEST_DATE"] ?></td>
+               <td ><?php echo $record["TEST_TYPE"] ?></td>
+               <td ><?php echo $record["RID"] ?></td>
+               <?php
+              
                $sql = 'SELECT thumbnail as tb, image_id as id 
                			FROM pacs_images pc
                			WHERE pc.record_id = '.$record["RID"];
-               //echo $sql; 
+               			
                $test = oci_parse($conn, $sql);
                $result = oci_execute($test);
                if (!$res) {
             		$err = oci_error($stid);
             		echo htmlentities($err['message']);
-            		
-       			 } else{
-       			 			//for ($i = 0; $i < count($try = oci_fetch_array($test)); $i++){
-										$try = oci_fetch_array($test);								  
-									  echo count($try);
-								
-       			 		}
+            	
 
-       			 	
+
+       			 } else{			
+       			 ?>	
+       			 		<td >
+       			 		<a href="index.jpeg" target="_Blank">
+    						<img src="index.jpeg" alt="Put something more exciting here." width="32" height="32" />
+							</a>
+							<?php echo "hello" ?></td>
+							
+					<?php
                echo "</tr>";
                $pos += 1;
-                //echo $record[0].'  |   ', $record[1].'   |  ', $record[2].'   |  ', $record[3].' | ',$record[4].' | ' , '<br/>';
             }
+
             }
+            ?>
+             </table>
+             
+             <?php
         // Free the statement identifier when closing the connection
         oci_free_statement($stid);
         oci_close($conn);
-    }
+    }}
 
 ?>
 			</table>
-</html>
+<script language="JavaScript">
+
+function openWin(img) {
+	window.open(img);
+
+}
+</script>

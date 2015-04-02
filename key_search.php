@@ -23,16 +23,16 @@
 			
 			if ($sdate) $sql =' '.$sql.' AND test_date >= \''.$sdate.'\'';		
 			if ($edate) $sql = ' '.$sql.' AND test_date <= \''.$edate.'\'';
-			if ($sortBy) $rest_of_query = ' ORDER BY (6*(score(1)+score(2))+3*score(3)+score(4))';
+			
+			if ($sortBy != "0") $rest_of_query = ' ORDER BY (6*(score(1)+score(2))+3*score(3)+score(4))';
 			else $rest_of_query = 'order by test_date';
-			if ($orderBy) $rest_of_query = $rest_of_query."ASC";
-			else $rest_of_query = $rest_of_query."DESC";
+			
+			if (!$orderBy != "0") $rest_of_query = $rest_of_query." ASC";
+			else $rest_of_query = $rest_of_query." DESC";
 			
 			$sql2 = sprintf($sql, $keyWord,$keyWord,$keyWord,$keyWord);
 			$sql = $sql2.$rest_of_query;		
 			?>
-			
-			<html>
 			<table border="1" class="clickable-row" >
 				<th align='center' valign='middle' width='100'>Result</th>
 				<th align='center' valign='middle' width='100'>DEBUG ONLY</th>
@@ -106,7 +106,7 @@
     }}
 
 ?>
-			</table>
+
 <script language="JavaScript">
 
 function openWin(img) {

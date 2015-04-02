@@ -8,6 +8,39 @@
 			'manage' => 'Manage Users',
 			'generate' => 'Generate Report',
 			'analysis' => 'Data analysis');
+			
+	// Obtains account type
+	function obtainType($usr) {
+		// Establish connection
+    	$conn = connect();
+        if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
+
+        // Sql command
+        $sql = 'SELECT u.class FROM users u WHERE u.user_name = \''.$usr.'\'';
+
+        // Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res = oci_execute($stid);
+
+			// Default patient
+        $type = 'p';
+        if ($res) {
+	        if ($info = oci_fetch_array($stid)) {
+	        		$type = $info["CLASS"];
+				}
+			}
+
+        // Free the statement identifier when closing the connection
+        oci_free_statement($stid);
+        oci_close($conn);
+
+        return $type;
+	}
 ?>
 
 <html>
@@ -15,13 +48,14 @@
 		<?php
 				if (isset($_SESSION["usr"])) {
 					// Logged in
-					// Establish modes array
+					// Establish modes array and get account type
 					global $modes;
-								
+					$type = obtainType($_SESSION["usr"]);
+
 					if (isset($_GET["mode"]) and array_key_exists($_GET["mode"], $modes)) {
 						// Valid mode
 						// Create switch form
-						switchForm($modes);
+						switchForm($modes, $type);
 						
 						// Create forms based on mode
 						if ($_GET["mode"] == "account") userForm($_SESSION["usr"], $_SESSION["pid"]);

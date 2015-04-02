@@ -1,16 +1,17 @@
 <?php
 	// Creates form for switching the mode 
-	function switchForm($modes) {
+	function switchForm($modes, $type) {
 	?>
 		<form name="switch">
 			<input type="hidden" name="mode" id="mode">
 			
 		<?php
 			foreach ($modes as $mode => $value) {
-		?>
-    		<input type="submit" <?php echo 'value="'.$value.'" onclick="switchMode(\''.$mode.'\')"'.((isset($_GET['mode']) and $_GET['mode'] == $mode) ? ' style="color:#000080;"': "").''; ?>>	
-
-    	<?php
+				if (true) {
+				?>
+    				<input type="submit" <?php echo 'value="'.$value.'" onclick="switchMode(\''.$mode.'\')"'.((isset($_GET['mode']) and $_GET['mode'] == $mode) ? ' style="color:#000080;"': "").''; ?>>	
+    			<?php
+				}
     		}
     	?>
 		</form>

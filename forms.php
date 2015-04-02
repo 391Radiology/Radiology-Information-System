@@ -168,16 +168,16 @@
 								style="margin-bottom:10px; height:25px; width:180px;">
 
 
-			<label id="sortBy" name="sort">Sort by : </label>
-			<select id="sortBy">
-	        					<option value="w">Test Date</option>
-    	    						<option value="m">Relevance</option>
+			Sort by :
+			<select id="sortBy" name="sortBy">
+	   		<option value="0">Test Date</option>
+    	    	<option value="1">Relevance</option>
     		</select>
     		
-			<label id="orderBy" name="order">Order by : </label>
-			<select id="orderBy">
-	        					<option value="w">Ascending</option>
-    	    						<option value="m">Descending</option>
+			Order by :
+			<select id="orderBy" name="orderBy">
+	      	<option value="0">Ascending</option>
+    	    	<option value="1">Descending</option>
     		</select>
     		
 			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
@@ -217,7 +217,7 @@
 						($edate ? 'End Date: '.dateToString($edate).'<br>': '');
 
 				// Call search_keyword with search string and formatted date strings (null if not it was not a valid date to begin with)
-				search_keyword($search, ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null), 0, 0);
+				search_keyword($search, ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null), $_GET["sortBy"], $_GET["orderBy"]);
 			} else {
 				// Error message for having no valid search parameters
 			?>

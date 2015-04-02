@@ -338,6 +338,7 @@
 							?> 
 							
 								style="margin-bottom:10px; height:25px; width:180px;">
+								
 
 			<!-- End of date range for test date -->
 			
@@ -348,7 +349,12 @@
 									echo 'value=', $_GET['edate'];	
 								}
 							?> 
-								style="margin-bottom:10px; height:25px; width:180px;">		
+								style="margin-bottom:10px; height:25px; width:180px;"><br>
+						<label id="timeperiodlabel" for="timeperiod:">Time Period: </label><select name="timeperiod" id="timeperiod">
+	        					<option value="w">Weekly</option>
+    	    						<option value="m">Monthly</option>
+    	    						<option value="y">Yearly</option>
+    						</select></br></br>
 			
 			
 			<input type="submit" name="analysis" value="Analysis" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>

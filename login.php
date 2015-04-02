@@ -15,7 +15,9 @@
         }
 
         // Sql command
-        $sql = 'SELECT * FROM users WHERE LOWER(user_name) = \''.strtolower($_POST["usr"]).'\' AND password = \''.$_POST["pwd"].'\'';
+        $sql = 'SELECT u.user_name, u.person_id, u.class
+        			 FROM users u 
+        			 WHERE LOWER(user_name) = \''.strtolower($_POST["usr"]).'\' AND password = \''.$_POST["pwd"].'\'';
 
         // Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql );
@@ -39,6 +41,7 @@
                 // Account was found, save account id and type in session
                 $_SESSION["usr"] = $account["USER_NAME"];
                 $_SESSION["pid"] = $account["PERSON_ID"];
+                $_SESSION["type"] = $account["CLASS"];
             }
         }
 
@@ -79,7 +82,8 @@
 <html>
     <TITLE>RIS Login</TITLE>
     <!-- Not logged in will show background -->
-    <body style=<?php echo (!isset($_SESSION["usr"]) ? "\"background-image:url(bg1.jpg); -background-color:#cccccc; background-size:100% 100%\"": "\"\"" ); ?>>
+    <body <?php echo (!isset($_SESSION["usr"]) ? "style=\"background-image:url(bg1.jpg);
+    					background-color:#cccccc; background-size:100% \"": "\"\"" ); ?>>
             <?php
                 if (!isset($_SESSION["usr"])) {
                     // Not logged in

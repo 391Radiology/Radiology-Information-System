@@ -3,27 +3,15 @@
 	include_once("PHPconnectionDB.php");
 	include_once("key_search.php");
 	include_once("report_generating_module.php");
+	include_once("dates_manager.php");
 	include_once("data_analysis_module.php");
 	
 	// Establish global types array
-	$types = array('a' => 'Admin',
+	$types = array(
+			'a' => 'Admin',
 			'd' => 'Doctor',
 			'r' => 'Radiologist',
 			'p' => 'Patient');
-	
-	// Creates form for switching the mode 
-	function switchForm() {
-	?>
-		<form name="switch">
-			<input type="hidden" name="mode" id="mode">
-    		<input type="submit" value="Account Info" onclick="switchMode('account')">	
-    		<input type="submit" value="Search" onclick="switchMode('search')">	
-    		<input type="submit" value="Manage Users" onclick="switchMode('manage')">	
-    		<input type="submit" value="Generate Report" onclick="switchMode('generate')">	
-    		<input type="submit" value="Data Analysis" onclick="switchMode('analysis')">	
-		</form>
-	<?php
-	}
 
 	// Creates forms for the account and person info of specified username which can be editted (called when mode == account)
     function userForm($usr, $pid) {	
@@ -338,7 +326,6 @@
 							?> 
 							
 								style="margin-bottom:10px; height:25px; width:180px;">
-								
 
 			<!-- End of date range for test date -->
 			
@@ -349,13 +336,12 @@
 									echo 'value=', $_GET['edate'];	
 								}
 							?> 
-								style="margin-bottom:10px; height:25px; width:180px;"><br>
-						<label id="timeperiodlabel" for="timeperiod:">Time Period: </label><select name="timeperiod" id="timeperiod">
+								style="margin-bottom:10px; height:25px; width:180px;">		
+									<label id="timeperiodlabel" for="timeperiod:">Time Period: </label><select name="timeperiod" id="timeperiod">
 	        					<option value="w">Weekly</option>
     	    						<option value="m">Monthly</option>
     	    						<option value="y">Yearly</option>
     						</select></br></br>
-			
 			
 			<input type="submit" name="analysis" value="Analysis" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
     	</form>
@@ -528,7 +514,7 @@
         	global $types; 
         	if ($info = oci_fetch_array($stid)) {
         	?>
-        		<div style="height:500px; width:intrinsic; overflow:auto;">
+        		<div style="display: inline-block; height:500px; overflow:auto;">
 	        		<table border="1">
 	        			<th width="100" align="center" valign="middle">Username</th>
 	        			<th width="100" align="center" valign="middle">Type</th>
@@ -565,16 +551,6 @@
         oci_free_statement($stid);
         oci_close($conn);
 	 }
-	 
-    // Convert a formatted string to date object
-    function stringToDate($date) {
-    	return DateTime::createFromFormat('Y-m-j', $date);
-    }
-
-    // Convert date object to formatted string
-    function dateToString($date) {
-    	return date_format($date,"j-M-Y");
-    }
 
     // Returns an array of all the types of diagnosis
     function diagnosisArray() {
@@ -620,11 +596,6 @@
 		newdiv.innerHTML = '<input type="text" name="key[]" style="margin-bottom:1px; height:25px; width:180px;"><br>';
 		document.getElementById('keywordsList').appendChild(newdiv);
 	}			
-
-	// Switches mode value
-	function switchMode(mode) {
-		document.getElementById('mode').value = mode;
-	}
 
 	function selectUser(user_name, person_id) {
 		document.getElementById('account').value = user_name;

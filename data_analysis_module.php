@@ -9,15 +9,16 @@
 
 		//Create a Table to get all the information that useful to data_analysis
 		
-		$sql = 'CREATE OR REPLACE VIEW Information_for_data_analysis ( FIRST_NAME, LAST_NAME, TEST_TYPE, TEST_DATE ,image_count) AS 
-                SELECT p.FIRST_NAME, p.LAST_NAME, r.TEST_TYPE, r.TEST_DATE ,count(i.IMAGE_ID)
+		$sql = 'CREATE OR REPLACE VIEW Information_for_data_analysis ( FIRST_NAME, LAST_NAME, TEST_TYPE, TEST_DATE ,IMAGE_ID) AS 
+                SELECT p.FIRST_NAME, p.LAST_NAME, r.TEST_TYPE, r.TEST_DATE ,i.IMAGE_ID
 					 FROM PERSONS p, RADIOLOGY_RECORD r, PACS_IMAGES i
-                WHERE p.PERSON_ID = r.PATIENT_ID AND i.RECORD_ID = r.RECORD_ID 
-                GROUP BY p.FIRST_NAME, p.LAST_NAME, r.TEST_TYPE, r.TEST_DATE';
+                WHERE p.PERSON_ID = r.PATIENT_ID AND i.RECORD_ID = r.RECORD_ID
+                ';
               
 		$stid = oci_parse($conn, $sql);
 
 		$res = oci_execute($stid);
+		
 		/*
 		echo 'test=========== : ',$_GET['timeperiod'];
 		if($_GET['sdate']<$_GET['edate']) {
@@ -27,11 +28,11 @@
 			};
 		//echo 'test=========== : ',$_GET['sdate'];
 		//echo 'test=========== : ',$_GET['edate'];
-		*/
 		
-		$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,i.image_count
-			    FROM Information_for_data_analysis i ';
-			    // WHERE i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' 
+		
+		$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,COUNT(IMAGE_ID)
+			    FROM Information_for_data_analysis i GROUP BY i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE';
+			    
 			     
 		echo 'SQL is =========== : ',$sql, '<br>';
 		
@@ -55,44 +56,63 @@
 
 	
 		
-		
+		*/
 		
 		if(!empty($fname)&&!empty($lname)&&empty($test_type)&&$_GET['sdate']==''&&$_GET['edate']==''){
 			echo'<th> name</th>';
-			$sql.='WHERE LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\'';
+			
+			$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,COUNT(IMAGE_ID)
+			    FROM Information_for_data_analysis i WHERE LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\' GROUP BY i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE';
+			//$sql.='WHERE LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\'';
 			}
 		if(empty($fname)&&empty($lname)&&!empty($test_type)&&$_GET['sdate']==''&&$_GET['edate']==''){
 			echo'<th> type</th>';
-			$sql.='WHERE i.TEST_TYPE = \''.($test_type).'\' ';
+			$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,COUNT(IMAGE_ID)
+			    FROM Information_for_data_analysis i WHERE i.TEST_TYPE = \''.($test_type).'\' GROUP BY i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE';
+			//$sql.='WHERE i.TEST_TYPE = \''.($test_type).'\' ';
 			}
 		if(empty($fname)&&empty($lname)&&empty($test_type)&&$_GET['sdate']!=''&&$_GET['edate']!=''){
 			echo'<th> time</th>';
-			$sql.='WHERE i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' ';
+			$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,COUNT(IMAGE_ID)
+			    FROM Information_for_data_analysis i WHERE i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' GROUP BY i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE';
+			//$sql.='WHERE i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' ';
 			}
 		if(!empty($fname)&&!empty($lname)&&!empty($test_type)&&$_GET['sdate']==''&&$_GET['edate']==''){
 			echo'<th> name type!!!!!!</th>';
-			$sql.='WHERE  LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\' AND i.TEST_TYPE = \''.($test_type).'\'';
+			$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,COUNT(IMAGE_ID)
+			    FROM Information_for_data_analysis i WHERE  LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\' AND i.TEST_TYPE = \''.($test_type).'\' GROUP BY i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE';
+			//$sql.='WHERE  LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\' AND i.TEST_TYPE = \''.($test_type).'\'';
 			}
 		if(empty($fname)&&empty($lname)&&!empty($test_type)&&$_GET['sdate']!=''&&$_GET['edate']!=''){
 			echo'<th> time type</th>';
-			$sql.='WHERE i.TEST_TYPE = \''.($test_type).'\' AND i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\'  ';
+			$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,COUNT(IMAGE_ID)
+			    FROM Information_for_data_analysis i WHERE i.TEST_TYPE = \''.($test_type).'\' AND i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' GROUP BY i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE';
+			//$sql.='WHERE i.TEST_TYPE = \''.($test_type).'\' AND i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\'  ';
 			}
 		if(!empty($fname)&&!empty($lname)&&empty($test_type)&&$_GET['sdate']!=''&&$_GET['edate']!=''){
 			echo'<th> name time</th>';
-			$sql.='WHERE  i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' AND LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\'';
+			$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,COUNT(IMAGE_ID)
+			    FROM Information_for_data_analysis i WHERE  i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' AND LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\' GROUP BY i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE';
+			//$sql.='WHERE  i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' AND LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\'';
 			}
+			
 		if(!empty($fname)&&!empty($lname)&&!empty($test_type)&&$_GET['sdate']!=''&&$_GET['edate']!=''){
 			echo'<th> name time type</th>';
-			$sql.='WHERE i.TEST_TYPE = \''.($test_type).'\' AND i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' AND LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\'';
+		$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,COUNT(IMAGE_ID)
+			    FROM Information_for_data_analysis i WHERE i.TEST_TYPE = \''.($test_type).'\' AND i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' AND LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\'GROUP BY i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE';
+			//$sql.='WHERE i.TEST_TYPE = \''.($test_type).'\' AND i.TEST_DATE >= \''.$sdate.'\' AND i.TEST_DATE <= \''.$edate.'\' AND LOWER(i.FIRST_NAME) = \''.strtolower($fname).'\' AND LOWER(i.LAST_NAME) = \''.strtolower($lname).'\'';
 			}
+			
+			
 		if(empty($fname)&&empty($lname)&&empty($test_type)&&$_GET['sdate']==''&&$_GET['edate']==''){
 			echo'<th> nothing</th>';
+					$sql = 'SELECT i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE,COUNT(IMAGE_ID) FROM Information_for_data_analysis i GROUP BY CUBE i.FIRST_NAME,i.LAST_NAME,i.TEST_TYPE,i.TEST_DATE';
 			}
 		
 
 					
 			
-		*/
+		
 		
 
 		
@@ -104,6 +124,7 @@
 
         // Execute a statement returned from oci_parse()
         $res = oci_execute($stid);
+
 	 	
 	 	  if (!$res) {
         	// Error, retrieve the error using the oci_error() function & output an error message
@@ -129,7 +150,7 @@
 						<td><?php echo $info["LAST_NAME"]; ?></td>
 						<td><?php echo $info["TEST_TYPE"]; ?></td>
 						<td><?php echo $info["TEST_DATE"]; ?></td>	
-						<td><?php echo $info["IMAGE_COUNT"]; ?></td>
+						<td><?php echo $info["COUNT(IMAGE_ID)"]; ?></td>
 					</tr>
 	 			<?php
 	 				$info = oci_fetch_array($stid);

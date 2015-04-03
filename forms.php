@@ -396,19 +396,13 @@
     		<!-- Hidden mode value -->
     		<input type="hidden" name="mode" value="analysis">
     		
-    		<!-- Search parameters --> 
-			Include Patient Name ?  <input type="text" name="fname" placeholder="" 
-			<?php if (isset($_GET['fname']) and $_GET['fname']) echo 'value='.$_GET['fname'].''; ?>
-			style="margin-bottom:10px; height:25px; width:180px;"> <br>
 
-			Include Test Type ?     <input type="text" name="test_type" placeholder="" 
-			<?php if (isset($_GET['test_type']) and $_GET['test_type']) echo 'value='.$_GET['test_type'].''; ?>
-			style="margin-bottom:10px; height:25px; width:180px;"> <br>
+
+			<input type="checkbox" name="fname" value="A" />Patient Name<br />
+			<input type="checkbox" name="test_type" value="B" />Test Type<br />
 			
-    		<!-- Start of date range for test date -->
-    		
 
-								
+ 			
 						<label id="timeperiodlabel" for="timeperiod:">Time Period: </label><select name="timeperiod" id="timeperiod">
 	        					<option value="a">All</option>
     	    						<option value="w">Weekly</option>
@@ -422,12 +416,10 @@
     	</form>
     <?php
     	if (isset($_GET['analysis'])) {
-    		$sdate = stringToDate($_GET["sdate"]);
-			$edate = stringToDate($_GET["edate"]);
-			//echo 'value!!!!!!!!!!!!!!!=', $_GET['timeperiod'];	
-			data_analysis($_GET['fname'], $_GET['lname'], $_GET['test_type'],($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null),$_GET['timeperiod']);
-			//echo 'information : ',$_GET['fname'];
-			//echo 'information : ',$_GET['sdate'];
+
+			//echo 'value!!!!!!!!!!!!!!!=', $_GET['checkbox1'];	
+			data_analysis($_GET['fname'], $_GET['test_type'],$_GET['timeperiod']);
+
     	}
     	}
     // Creates form for logging out

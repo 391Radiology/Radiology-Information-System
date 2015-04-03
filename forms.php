@@ -170,6 +170,27 @@
     		<input type="hidden" name="mode" value="search">
     		<input type="hidden" name="rid" id="rid">
     		
+			<div style="float:left; margin-right:10px;">
+			<!-- Dynamic list of keywords -->
+			<div id="keywordsList">
+			<?php
+				for($n=0; $n < (isset($_GET["key"]) ? count($_GET["key"]) : 1); $n++) {
+					// If there is a list of keywords, iterate through it, else just go through loop once
+					if (!isset($_GET["key"]) or $_GET["key"][$n] or ($n == 0 and count(array_filter($_GET["key"])) == 0)) {
+					?>
+						<!-- If there was no list of keys, there is a valid key at position n, or n == 0 with no valid values in the list of keys
+							then make a new text input. If there is a valid key at position n then set the value to the key -->
+						<input type="text" name="key[]" <?php echo 'value=\''.(isset($_GET["key"][$n]) ? $_GET["key"][$n] : '').'\''; ?> 
+								style="margin-bottom:1px; height:25px; width:180px;"><br>
+					<?php
+					}
+				}
+			?>
+			</div>
+			<!-- Button calls javascript function add_keyword() to add another text input into the dynamic list of keywords -->
+			<input type="button" name="add" value="Add Keyword" onclick="addKeyword()" style="margin-top:10px; height:25px; width:180px;">
+			</div>    		
+    		
     		<!-- Start of date range for test date -->
 			Start Date : <input type="date" name="sdate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}" 
 							<?php
@@ -203,27 +224,7 @@
     	    	<option value="1">Descending</option>
     		</select>
     		
-			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
-
-			<!-- Dynamic list of keywords -->
-			<div id="keywordsList">
-			<?php
-				for($n=0; $n < (isset($_GET["key"]) ? count($_GET["key"]) : 1); $n++) {
-					// If there is a list of keywords, iterate through it, else just go through loop once
-					if (!isset($_GET["key"]) or $_GET["key"][$n] or ($n == 0 and count(array_filter($_GET["key"])) == 0)) {
-					?>
-						<!-- If there was no list of keys, there is a valid key at position n, or n == 0 with no valid values in the list of keys
-							then make a new text input. If there is a valid key at position n then set the value to the key -->
-						<input type="text" name="key[]" <?php echo 'value=\''.(isset($_GET["key"][$n]) ? $_GET["key"][$n] : '').'\''; ?> 
-								style="margin-bottom:1px; height:25px; width:180px;"><br>
-					<?php
-					}
-				}
-			?>
-			</div>
-
-			<!-- Button calls javascript function add_keyword() to add another text input into the dynamic list of keywords -->
-			<input type="button" name="add" value="Add Keyword" onclick="addKeyword()" style="margin-top:10px; height:25px; width:180px;">
+			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;">
                         
 		</form>
     <?php
@@ -233,14 +234,14 @@
 			$sdate = stringToDate($_GET["sdate"]);
 			$edate = stringToDate($_GET["edate"]);
 
-			if ($search or $sdate or $edate) { 
+			if (rtrim($search) or $sdate or $edate) { 
 				// Valid search string or date objects
 				echo 'Search results for:<br>', ($search ? 'Keyword(s): '.$search.'<br>' : ''), 
 						($sdate ? 'Start Date: '.dateToString($sdate).' '.($edate ? '' : '<br>').'' : ''), 
 						($edate ? 'End Date: '.dateToString($edate).'<br>': '');
 
 				// Call search_keyword with search string and formatted date strings (null if not it was not a valid date to begin with)
-				search_keyword($search, ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null), $_GET["sortBy"], $_GET["orderBy"]);
+				//search_keyword($search, ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null), $_GET["sortBy"], $_GET["orderBy"]);
 			} else {
 				// Error message for having no valid search parameters
 			?>

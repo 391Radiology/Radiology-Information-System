@@ -369,6 +369,7 @@
 								style="margin-bottom:10px; height:25px; width:180px;" required>
 
 			<input type="submit" name="generate" value="Generate" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
+			
 		</form>
 		
 		
@@ -383,8 +384,10 @@
 
    	// Creates form for data analysis
    	// Creates form for data analysis
+   	
     function analysisForm() {
     ?>
+    
      	<h1>
 	  		Data Analysis
 	   </h1>
@@ -394,43 +397,24 @@
     		<input type="hidden" name="mode" value="analysis">
     		
     		<!-- Search parameters --> 
-			Patient First Name : <input type="text" name="fname" placeholder="Patient First Name" 
+			Include Patient Name ?  <input type="text" name="fname" placeholder="" 
 			<?php if (isset($_GET['fname']) and $_GET['fname']) echo 'value='.$_GET['fname'].''; ?>
-			style="margin-bottom:10px; height:25px; width:180px;"> 
-			Patient Last Name : <input type="text" name="lname" placeholder="Patient Last Name" 
-			<?php if (isset($_GET['lname']) and $_GET['lname']) echo 'value='.$_GET['lname'].''; ?>
-			style="margin-bottom:10px; height:25px; width:180px;"><br>
-			Test Type : <input type="text" name="test_type" placeholder="Test Type" 
+			style="margin-bottom:10px; height:25px; width:180px;"> <br>
+
+			Include Test Type ?     <input type="text" name="test_type" placeholder="" 
 			<?php if (isset($_GET['test_type']) and $_GET['test_type']) echo 'value='.$_GET['test_type'].''; ?>
 			style="margin-bottom:10px; height:25px; width:180px;"> <br>
 			
     		<!-- Start of date range for test date -->
-			Start Date : <input type="date" name="sdate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}" 
-							<?php
-					       		if (isset($_GET['sdate']) and DateTime::createFromFormat('Y-m-j', $_GET['sdate'])) {
-					       			// If there's a valid start date then set value of input to the submitted date
-					       			echo 'value=', $_GET['sdate'];
-								}
-							?> 
-							
-								style="margin-bottom:10px; height:25px; width:180px;">
-								
+    		
 
-			<!-- End of date range for test date -->
-			
-			End Date : <input type="date" name="edate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}"
-							<?php
-								if (isset($_GET['edate']) and DateTime::createFromFormat('Y-m-j', $_GET['edate'])) {
-									// If there's a valid end date then set value of input to the submitted date
-									echo 'value=', $_GET['edate'];	
-								}
-							?> 
-								style="margin-bottom:10px; height:25px; width:180px;"><br>
 								
 						<label id="timeperiodlabel" for="timeperiod:">Time Period: </label><select name="timeperiod" id="timeperiod">
-	        					<option value="w">Weekly</option>
+	        					<option value="a">All</option>
+    	    						<option value="w">Weekly</option>
     	    						<option value="m">Monthly</option>
     	    						<option value="y">Yearly</option>
+    	    						<option value="n">None</option>
     						</select></br></br>
 			
 			
@@ -442,11 +426,10 @@
 			$edate = stringToDate($_GET["edate"]);
 			//echo 'value!!!!!!!!!!!!!!!=', $_GET['timeperiod'];	
 			data_analysis($_GET['fname'], $_GET['lname'], $_GET['test_type'],($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null),$_GET['timeperiod']);
-			echo 'information : ',$_GET['fname'];
-			echo 'information : ',$_GET['sdate'];
+			//echo 'information : ',$_GET['fname'];
+			//echo 'information : ',$_GET['sdate'];
     	}
-   
-    }
+    	}
     // Creates form for logging out
     function logoutForm() {
     ?>

@@ -145,5 +145,9 @@ for i in range(len(first_names)):
                                 i_count += 10
                 r_count += 1
 
+output.write("CREATE OR REPLACE VIEW Information_for_data_analysis ( FIRST_NAME, LAST_NAME, TEST_TYPE, TEST_DATE ,IMAGE_ID) AS 
+                SELECT p.FIRST_NAME, p.LAST_NAME, r.TEST_TYPE, r.TEST_DATE ,i.IMAGE_ID
+					 FROM PERSONS p, RADIOLOGY_RECORD r, PACS_IMAGES i
+                WHERE p.PERSON_ID = r.PATIENT_ID AND i.RECORD_ID = r.RECORD_ID;")
 output.write("Commit;")
 output.close()

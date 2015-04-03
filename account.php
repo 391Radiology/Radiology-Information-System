@@ -54,18 +54,32 @@
 
 					if (isset($_GET["mode"]) and array_key_exists($_GET["mode"], $modes)) {
 						// Valid mode
+					?>
+						<div style="background-color:rgba(173, 216, 230, 0.75); text-align:right;">
+						<?php
+							// Create logout form
+							logoutForm();
+						?>
+						</div>
+						
+						<div style="background-color:rgba(173, 216, 230, 0.75); float:left; height:100%;">
+					<?php	
 						// Create switch form
 						switchForm($modes, $type);
+					?>
+						</div>
 						
+						<div style="float:left; margin-left:20px;">
+					<?php
 						// Create forms based on mode
 						if ($_GET["mode"] == "account") userForm($_SESSION["usr"], $_SESSION["pid"]);
 						else if ($_GET["mode"] == "search") searchForm();
 						else if ($_GET["mode"] == "manage") manageForm();
 						else if ($_GET["mode"] == "generate") generateForm();
 						else if ($_GET["mode"] == "analysis") analysisForm();
-
-						// Create logout form
-						logoutForm();
+					?>
+						<div>
+					<?php
 					} else {
 						// Nonvalid mode
 						echo "Nonvalid mode specified, redirecting...";

@@ -28,9 +28,15 @@ names = ["Raymond Lieu", \
          "Miyuki Shiba", \
          "Moroha Haimura"]
 
+location = ["Edmonton", "Calgary", "Toronto", "Montreal", "Quebec", "Goryeo", "Gaebong"]
+
+test = ["MRI", "CT", "X-RAY", "BLOOD", "DNA"]
+
 results = [["DEAD", "Doctor messed up"], \
            ["ALIVE", "Cannot believe the doctor actually did it"], \
-           ["COMATOSE", "Weird..."]]
+           ["COMATOSE", "Weird..."], \
+           ["PARALYZED", "Darn that Pikachu and its thunder bolt"], \
+           ["BURNED", "Darn that Groudon and its fire blast"]]
 
 first_names = []
 last_names = []
@@ -53,14 +59,14 @@ for i in range(len(first_names)):
                      str(i) + ", " + \
                      "'" + first_names[i] + "'" + ", " + \
                      "'" + last_names[i] + "'" + ", " + \
-                     "'" + str(i) + "Edmonton" + "'" + ", " + \
+                     "'" + location[i%len(location)] + "'" + ", " + \
                      "'" + first_names[i] + "@hotmail.com" + "'" + ", " + \
                      "'" + "780" + str(i%9)*3 + str(i%9)*4 + "'" + \
                     ");\n")
 
 # users
 output.write("Insert into users values ('admin', 'admin', 'a', 2, " + \
-             "'" + (date + datetime.timedelta(days=i)).strftime('%d-%b-%Y') + "'" + \
+             "'" + date.strftime('%d-%b-%Y') + "'" + \
              ");\n")
 
 for i in range(len(first_names)):
@@ -70,7 +76,7 @@ for i in range(len(first_names)):
                              "'" + "pwd" "'" + ", " + \
                              "'" + "a" + "'" + ", " + \
                              str(i) + ", " + \
-                             "'" + (date + datetime.timedelta(days=i)).strftime('%d-%b-%Y') + "'" + \
+                             "'" + (date + datetime.timedelta(days=(i+1)*(i+3))).strftime('%d-%b-%Y') + "'" + \
                              ");\n")
         if (i%2 == 0):
                 output.write("Insert into users values (" + \
@@ -78,7 +84,7 @@ for i in range(len(first_names)):
                              "'" + "pwd" "'" + ", " + \
                              "'" + "d" + "'" + ", " + \
                              str(i) + ", " + \
-                             "'" + (date + datetime.timedelta(days=i)).strftime('%d-%b-%Y') + "'" + \
+                             "'" + (date + datetime.timedelta(days=(i+2)*(i+2))).strftime('%d-%b-%Y') + "'" + \
                              ");\n")
         if (i%5 == 0):
                 output.write("Insert into users values (" + \
@@ -86,7 +92,7 @@ for i in range(len(first_names)):
                              "'" + "pwd" "'" + ", " + \
                              "'" + "r" + "'" + ", " + \
                              str(i) + ", " + \
-                             "'" + (date + datetime.timedelta(days=i)).strftime('%d-%b-%Y') + "'" + \
+                             "'" + (date + datetime.timedelta(days=(i+1)*(i+5))).strftime('%d-%b-%Y') + "'" + \
                              ");\n")   
         output.write("Insert into users values (" + \
                      "'" + "p_" + first_names[i] + last_names[i] + "'" + ", " + \
@@ -114,9 +120,9 @@ for i in range(len(first_names)):
                                  str(i) + ", " + \
                                  str(x) + ", " + \
                                  str(0) + ", " + \
-                                 "'" + "MRI" + "'" + ", " + \
-                                 "'" + (date + datetime.timedelta(days=i*i%300+25)).strftime('%d-%b-%Y') + "'"  + ", " + \
-                                 "'" + (date + datetime.timedelta(days=i*i+300+40)).strftime('%d-%b-%Y') + "'"  + ", " + \
+                                 "'" + test[(i*i+x)%len(test)] + "'" + ", " + \
+                                 "'" + (date + datetime.timedelta(days=i*(i*x)%300)).strftime('%d-%b-%Y') + "'"  + ", " + \
+                                 "'" + (date + datetime.timedelta(days=i*(i*x)+300+15)).strftime('%d-%b-%Y') + "'"  + ", " + \
                                  "'" + results[int((x+i)*0.75)%len(results)][0] + "'" + ", " + \
                                  "'" + results[int((x+i)*0.75)%len(results)][1] + "'" + \
                                  ");\n")

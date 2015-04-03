@@ -106,7 +106,7 @@
 	         	   Change Password
 	        	</h1>
 
-	 			<form name="info" method="post" action="account.php?mode=account">
+	 			<form name="info" method="post">
 					<!-- Ask for old pwd and new pwd twice -->
 					Old Password : <input type="password" name="opwd" maxlength="24"
 											style="margin-top:10px; height:25px; width:180px;" required><br>
@@ -143,6 +143,10 @@
     // Creates form for searching (called when mode == search)
     function searchForm() {
     ?>
+    	<h1>
+	  		Search
+	   </h1>
+	        	
     	<form name="search" method="get">
     		<!-- Hidden values -->
     		<input type="hidden" name="mode" value="search">
@@ -232,7 +236,11 @@
 
 	// Creates form for managing users
     function manageForm() {
-    ?>
+    ?>    	
+    	<h1>
+	  		User Manager
+	  	</h1>
+    
     	<form name="manage" method="get">
     		<!-- Hidden mode value -->
     		<input type="hidden" name="mode" value="manage">
@@ -253,16 +261,20 @@
 			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
     	</form>
     <?php
-    	if (isset($_GET['search'])) {
-			obtainUsers($_GET['usr'], $_GET['fname'], $_GET['lname']);
-    	} else if (isset($_GET['account']) and isset($_GET['pid'])) {
+    	if (isset($_GET['account']) and $_GET["account"] and isset($_GET['pid']) and $_GET["pid"]) {
     		userForm($_GET['account'], $_GET['pid']);
+    	} else if (isset($_GET['search'])) {
+			obtainUsers($_GET['usr'], $_GET['fname'], $_GET['lname']);
     	}
     }
 
    	// Creates form for generating a report
     function generateForm() {
     ?>
+		<h1>
+	  		Report Generator
+	   </h1>    
+    
     	<form name="search" method="get">
     		<!-- Hidden mode value -->
     		<input type="hidden" name="mode" value="generate">
@@ -316,6 +328,10 @@
    	// Creates form for data analysis
     function analysisForm() {
     ?>
+     	<h1>
+	  		Data Analysis
+	   </h1>
+	   
     	<form name="analysis" method="get">
     		<!-- Hidden mode value -->
     		<input type="hidden" name="mode" value="analysis">
@@ -377,8 +393,9 @@
     // Creates form for logging out
     function logoutForm() {
     ?>
-    	<form name="logout" action="logout.php">
-    		<input type="submit" name="logout" value="Logout">	
+
+    	<form name="logout" action="logout.php" style="margin-bottom:0px; border-bottom-width:0px;">
+    		<input type="submit" name="logout" value="Logout" style="height:25px; width:180px;">	
 		</form>
     <?php
     }
@@ -418,7 +435,7 @@
         	global $types; 
         	if ($info = oci_fetch_array($stid)) {
         	?>
-        		<div style="display: inline-block; height:600px; overflow:auto;">
+        		<div style="display:inline-block; height:600px; overflow:auto;">
 	        		<table border="1">
 	        			<th width="100" align="center" valign="middle">Username</th>
 	        			<th width="100" align="center" valign="middle">Type</th>

@@ -164,7 +164,8 @@
     	<h1>
 	  		Search
 	   </h1>
-	        	
+	   
+	   <div>
     	<form name="search" method="get">
     		<!-- Hidden values -->
     		<input type="hidden" name="mode" value="search">
@@ -227,10 +228,11 @@
 			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;">
                         
 		</form>
+		</div>
     <?php
     	if (isset($_GET['search'])) {
     		// Obtain search parameters (concatenate keys list into single string and convert dates to date objects)
-			$search = implode(" ", $_GET["key"]);
+			$search = (isset($_GET["key"]) ? implode(" ", $_GET["key"]) : null);
 			$sdate = stringToDate($_GET["sdate"]);
 			$edate = stringToDate($_GET["edate"]);
 

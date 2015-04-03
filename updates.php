@@ -116,4 +116,32 @@
 	    	$_SESSION["pwdErr"] = "Passwords do not match";
 	    }
     }
+    
+        function deleteAcc($usr) {
+	    		// Establish connection
+	        $conn = connect();
+	        if (!$conn) {
+	            $e = oci_error();
+	            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+	        }
+
+	        // Sql command
+	        $sql = 'DELETE FROM users WHERE LOWER(user_name) = \''.strtolower($usr).'\'';
+
+	        // Prepare sql using conn and returns the statement identifier
+	        $stid = oci_parse($conn, $sql);
+
+	        // Execute a statement returned from oci_parse()
+	        $res = oci_execute($stid);
+
+	        if (!$res) {
+	        	// Error, retrieve the error using the oci_error() function & output an error message
+	     	   	$err = oci_error($stid);
+	     	   	echo htmlentities($err['message']);
+	        }
+	        
+	        // Free the statement identifier when closing the connection
+	        oci_free_statement($stid);
+	        oci_close($conn);
+    }
 ?>

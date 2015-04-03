@@ -1,11 +1,13 @@
 <?php
 	include_once("forms.php");
 	include_once("switcher.php");	
-	
+
 	$modes = array(
 			'account' => 'Account Info',
 			'search' => 'Search',
 			'manage' => 'Manage Users',
+			'doctor' => 'Family Doctor Info',
+			'upload' => 'New Record',
 			'generate' => 'Generate Report',
 			'analysis' => 'Data analysis');
 			
@@ -27,11 +29,13 @@
         // Execute a statement returned from oci_parse()
         $res = oci_execute($stid);
 
-			// Default patient
-        $type = 'p';
+        $type;
         if ($res) {
 	        if ($info = oci_fetch_array($stid)) {
 	        		$type = $info["CLASS"];
+				} else {
+					echo "This account doesn't exist anymore";
+					header("refresh:3; url=logout.php");
 				}
 			}
 
@@ -50,10 +54,10 @@
 					// Logged in
 					// Establish modes array and get account type
 					global $modes;
-					$type = obtainType($_SESSION["usr"]);
-
+					$type = obtainType($_SESSION["usr"]);			
+					
 					if (isset($_GET["mode"]) and array_key_exists($_GET["mode"], $modes)) {
-						// Valid mode
+						// Valid mode	
 					?>
 						<div style="background-color:rgba(173, 216, 230, 0.75); text-align:right;">
 						<?php
@@ -72,11 +76,13 @@
 						<div style="float:left; margin-left:20px;">
 					<?php
 						// Create forms based on mode
-						if ($_GET["mode"] == "account") userForm($_SESSION["usr"], $_SESSION["pid"]);
+						if ($_GET["mode"] == "account") userForm($_SESSION["usr"], $_SESSION["pid"], $type);
 						else if ($_GET["mode"] == "search") searchForm();
-						else if ($_GET["mode"] == "manage") manageForm();
-						else if ($_GET["mode"] == "generate") generateForm();
+						else if ($_GET["mode"] == "manage") manageForm($type);
+						else if 	($_GET["mode"] == "doctor") familyDoctorForm($type);
+						else if ($_GET["mode"] == "generate") generateForm($type);
 						else if ($_GET["mode"] == "analysis") analysisForm();
+						else if ($_GET["mode"] == "upload") uploadForm($type);
 					?>
 						<div>
 					<?php

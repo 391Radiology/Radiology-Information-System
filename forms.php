@@ -15,7 +15,7 @@
 			'p' => 'Patient');	
 	
 	// Creates forms for the account and person info of specified username which can be editted (called when mode == account)
-    function userForm($usr, $pid) {	
+    function userForm($usr, $pid, $type) {	
         // Establish connection
         $conn = connect();
         if (!$conn) {
@@ -24,8 +24,9 @@
         }
 
    		// Try to update info if previous request was made
-    	if (isset($_POST["saveInfo"])) updateInfo($usr, $pid);
-		else if (isset($_POST["savePwd"])) updatePwd($usr);
+    		if (isset($_POST["saveInfo"])) updateInfo($usr, $pid);
+			else if (isset($_POST["savePwd"])) updatePwd($usr);
+			else if (isset($_POST["deleteAcc"])) deleteAcc($usr);
 		
         // Sql command
         $sql = 'SELECT u.user_name, p.person_id, u.class, p.first_name, p.last_name, p.address, p.phone, p.email  
@@ -52,19 +53,22 @@
 
         	if ($info) {
 			?>
+				<div style="float:left;">
+				
 				<h1>
 	         	   Account Info
 	        	</h1>
 
-	        	<!-- -->
-				<form name="info" method="post">
+				<form name="info" method="post" style="text-align:right;">
+					<fieldset>
+					<legend>Update Info:</legend>
 					<!-- Create a selection for account types -->
 					Account Type : <select name = "class">
 	    								<?php
-											foreach ($types as $key => $type) {
+											foreach ($types as $key => $class) {
 												// Add every type from types into the selection
 											?>
-												<option <?php echo 'value='.$key.' '.($key == $info['CLASS'] ? 'selected': '').''; ?>><?php echo ''.$type.''; ?></option>
+												<option <?php echo 'value='.$key.' '.($key == $info['CLASS'] ? 'selected': '').''; ?>><?php echo ''.$class.''; ?></option>
 											<?php
 											}
 										?>
@@ -73,10 +77,10 @@
 					<!-- Basic personal information -->
 					First Name : <input type="text" name="fname" placeholder="First Name" maxlength="24"
 										<?php if (isset($info['FIRST_NAME'])) echo 'value="'.$info['FIRST_NAME'].'"'; ?>
-										style="margin-top:10px; height:25px; width:180px;" required><br>
+										style="margin-top:10px; height:25px; width:180px;" required <?php if ($type != 'a') echo "readonly"; ?>><br>
 					Last Name : <input type="text" name="lname" placeholder="Last Name" maxlength="24"
 										<?php if (isset($info['LAST_NAME'])) echo 'value="'.$info['LAST_NAME'].'"'; ?>
-										style="margin-top:10px; height:25px; width:180px;" required><br>
+										style="margin-top:10px; height:25px; width:180px;" required <?php if ($type != 'a') echo "readonly"; ?>><br>
 					Address : <input type="text" name="address" placeholder="Address" maxlength="128"
 										<?php if (isset($info['ADDRESS'])) echo 'value="'.$info['ADDRESS'].'"'; ?>
 										style="margin-top:10px; height:25px; width:180px;"><br>
@@ -99,14 +103,13 @@
 		            ?>
             		</div>
 
-					<input type="submit" name="saveInfo" value="Save" style="margin-top:10px; height:25px; width:180px;">
+					<input type="submit" name="saveInfo" value="Update" style="margin-top:10px; height:25px; width:180px;">
+					</fieldset>
 	 			</form>
 
-				<h1>
-	         	   Change Password
-	        	</h1>
-
-	 			<form name="info" method="post">
+	 			<form name="info" method="post" style="text-align:right;">
+	 				<fieldset>
+	 				<legend>Change Password:</legend>
 					<!-- Ask for old pwd and new pwd twice -->
 					Old Password : <input type="password" name="opwd" maxlength="24"
 											style="margin-top:10px; height:25px; width:180px;" required><br>
@@ -127,8 +130,23 @@
 		            ?>
             		</div>
 
-					<input type="submit" name="savePwd" value="Save" style="margin-top:10px; height:25px; width:180px;">
+					<input type="submit" name="savePwd" value="Change" style="margin-top:10px; height:25px; width:180px;">
+					</fieldset>
 	 			</form>
+	 			
+	 			<form name="info" method="post" style="text-align:right;">
+	 				<fieldset>
+	 				<?php
+	 					if ($usr != $_SESSION["usr"]) {
+	 				?>
+					<input type="submit" name="deleteAcc" value="Delete Account" style="margin-top:10px; height:25px; width:180px;">
+					<?php
+						}
+					?>
+					<input type="submit" name="cancel" value="Cancel" style="margin-top:10px; height:25px; width:180px;">
+					</fieldset>
+	 			</form>
+	 			</div>
 			<?php
 			} else {
 				echo "Account doesn't exist anymore";
@@ -235,7 +253,7 @@
     }
 
 	// Creates form for managing users
-    function manageForm() {
+    function manageForm($type) {
     ?>    	
     	<h1>
 	  		User Manager
@@ -261,15 +279,51 @@
 			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
     	</form>
     <?php
-    	if (isset($_GET['account']) and $_GET["account"] and isset($_GET['pid']) and $_GET["pid"]) {
-    		userForm($_GET['account'], $_GET['pid']);
+    	if ($_GET["account"] and $_GET["pid"]) {
+    		userForm($_GET['account'], $_GET['pid'], $type);
     	} else if (isset($_GET['search'])) {
 			obtainUsers($_GET['usr'], $_GET['fname'], $_GET['lname']);
     	}
     }
 
+		// Creates form for managing family doctors
+    function familyDoctorForm($type) {
+    ?>    	
+    	<h1>
+			Family Doctor Info
+	  	</h1>
+    
+    	<form name="manage" method="get">
+    		<!-- Hidden mode value -->
+    		<input type="hidden" name="mode" value="doctor">
+    		<input type="hidden" name="account" id="account">
+    		<input type="hidden" name="pid" id="pid">
+    		
+    		<!-- Search parameters -->
+			First Name : <input type="text" name="fname" placeholder="First Name" 
+			<?php if (isset($_GET['fname']) and $_GET['fname']) echo 'value='.$_GET['fname'].''; ?>
+			style="margin-bottom:10px; height:25px; width:180px;"> 
+			Last Name : <input type="text" name="lname" placeholder="Last Name" 
+			<?php if (isset($_GET['lname']) and $_GET['lname']) echo 'value='.$_GET['lname'].''; ?>
+			style="margin-bottom:10px; height:25px; width:180px;"> 
+			
+			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
+    	</form>
+    	
+    <?php
+    }
+
+		// Creates form for uploading
+    function uploadForm($type) {
+    ?>    	
+    	<h1>
+			New Record
+	  	</h1>   
+    <?php
+    }
+
    	// Creates form for generating a report
-    function generateForm() {
+    function generateForm($type) {
     ?>
 		<h1>
 	  		Report Generator

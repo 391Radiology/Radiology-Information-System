@@ -37,7 +37,7 @@
 			if (!empty($fname)||!empty($test_type)||!empty($timeperiod)){
 				$sql.="GROUP BY ( ";
 				if (!empty($fname)){
-					$sql.=' FIRST_NAME,LAST_NAME, ';
+					$sql.=' FIRST_NAME,LAST_NAME,';
 				}
 				if (!empty($test_type)){
 					$sql.=' TEST_TYPE,';
@@ -61,7 +61,7 @@
 				}
 			if (!empty($fname)){
 				$sql.='ORDER BY FIRST_NAME';
-				}if (!empty($test_type)){
+				}elseif (!empty($test_type)){
 					$sql.='ORDER BY TEST_TYPE';
 					}
 			    
@@ -135,7 +135,7 @@
 								echo '<td>' .$info[0].' '.$info[1].'</td>'	;
 								}	 		
 					 		}
-					 	if ($timeperiod == 'y'){
+					 	if ($timeperiod == 'y'||$timeperiod == 'a'){
 					 		
 							if (!empty($fname)&&!empty($test_type)){
 								echo '<td>' .$info[3].'</td>'	;

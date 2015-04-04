@@ -593,7 +593,7 @@
 
  			
 						<label id="timeperiodlabel" for="timeperiod:">Time Period: </label><select name="timeperiod" id="timeperiod">
-	        					<option value="a">All</option>
+	        					<option value="a">Daily</option>
     	    						<option value="w">Weekly</option>
     	    						<option value="m">Monthly</option>
     	    						<option value="y">Yearly</option>

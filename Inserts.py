@@ -1,11 +1,23 @@
 import datetime
 
+# Open original Setup.sql and write lines from that file into CustomScript.sql
 file = open('Setup.sql', 'r')
 output = open('CustomScript.sql', 'w') 
 for line in file:
         output.write(line)
 file.close()
 
+# Create Sequences for ids
+output.write("DROP SEQUENCE person_id;\n")
+output.write("DROP SEQUENCE record_id;\n")
+output.write("CREATE SEQUENCE person_id MINVALUE 0 START WITH 0 INCREMENT BY 1;\n")
+output.write("CREATE SEQUENCE record_id MINVALUE 0 START WITH 0 INCREMENT BY 1;\n")
+
+# Create views
+output.write("DROP VIEW information_for_data_analysis;\n")
+output.write("CREATE VIEW information_for_data_analysis ( FIRST_NAME, LAST_NAME, TEST_TYPE, TEST_DATE ,IMAGE_ID) AS SELECT p.FIRST_NAME, p.LAST_NAME,  r.TEST_TYPE, r.TEST_DATE ,i.IMAGE_ID FROM PERSONS p, RADIOLOGY_RECORD r, PACS_IMAGES i WHERE p.PERSON_ID = r.PATIENT_ID AND i.RECORD_ID = r.RECORD_ID;\n")
+
+# Data
 names = ["Raymond Lieu", \
          "Liangrui Lu", \
          "Omar Zioueche", \
@@ -47,6 +59,7 @@ f1 = "RAWTOHEX('Test Thumbnail')"
 f2 = "RAWTOHEX('Test Regular Size')"
 f3 = "RAWTOHEX('Test Full Size')"
 
+# Separate names into first and last name
 for i in names:
         name = i.split(" ")
         first_names.append(name[0])
@@ -56,7 +69,7 @@ for i in names:
 # persons
 for i in range(len(first_names)):
         output.write("Insert into persons values (" + \
-                     str(i) + ", " + \
+                     "person_id.nextval" + ", " + \
                      "'" + first_names[i] + "'" + ", " + \
                      "'" + last_names[i] + "'" + ", " + \
                      "'" + location[i%len(location)] + "'" + ", " + \
@@ -145,9 +158,12 @@ for i in range(len(first_names)):
                                 i_count += 10
                 r_count += 1
 
-output.write("CREATE OR REPLACE VIEW Information_for_data_analysis ( FIRST_NAME, LAST_NAME, TEST_TYPE, TEST_DATE ,IMAGE_ID) AS 
-                SELECT p.FIRST_NAME, p.LAST_NAME, r.TEST_TYPE, r.TEST_DATE ,i.IMAGE_ID
-					 FROM PERSONS p, RADIOLOGY_RECORD r, PACS_IMAGES i
-                WHERE p.PERSON_ID = r.PATIENT_ID AND i.RECORD_ID = r.RECORD_ID;")
+# Indexes
+output.write("Create index indexa on persons(first_name) indextype is ctxsys.context;\n")
+output.write("Create index indexb on persons(last_name) indextype is ctxsys.context;\n")
+output.write("Create index indexc on radiology_record(diagnosis) indextype is ctxsys.context;\n")
+output.write("Create index indexd on radiology_record(description) indextype is ctxsys.context;\n")
+
+# Commit
 output.write("Commit;")
 output.close()

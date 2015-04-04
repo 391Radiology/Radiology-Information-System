@@ -1,5 +1,5 @@
 <?php
-	session_start();
+	if (session_status() == PHP_SESSION_NONE) session_start();
 	include_once("PHPconnectionDB.php");
 	include_once("key_search.php");
 	include_once("report_generating_module.php");
@@ -24,9 +24,12 @@
         }
 
    		// Try to update info if previous request was made
-    		if (isset($_POST["saveInfo"])) updateInfo($usr, $pid);
-			else if (isset($_POST["savePwd"])) updatePwd($usr);
-			else if (isset($_POST["deleteAcc"])) deleteAcc($usr);
+    	if (isset($_POST["saveInfo"])) {
+    		if (!checkUsedEmail($pid)) updateInfo($usr, $pid);
+    		else $_SESSION["infoErr"] = "Email already in use";
+    	}
+		else if (isset($_POST["savePwd"])) updatePwd($usr);
+		else if (isset($_POST["deleteAcc"])) deleteAcc($usr);
 		
         // Sql command
         $sql = 'SELECT u.user_name, p.person_id, u.class, p.first_name, p.last_name, p.address, p.phone, p.email  
@@ -68,7 +71,7 @@
 											foreach ($types as $key => $class) {
 												// Add every type from types into the selection
 											?>
-												<option <?php echo 'value='.$key.' '.($key == $info['CLASS'] ? 'selected': '').''; ?>><?php echo ''.$class.''; ?></option>
+												<option <?php echo 'value='.$key.' '.((isset($info['CLASS']) and $key == $info['CLASS']) ? 'selected': '').''; ?>><?php echo ''.$class.''; ?></option>
 											<?php
 											}
 										?>
@@ -111,8 +114,14 @@
 	 				<fieldset>
 	 				<legend>Change Password:</legend>
 					<!-- Ask for old pwd and new pwd twice -->
-					Old Password : <input type="password" name="opwd" maxlength="24"
-											style="margin-top:10px; height:25px; width:180px;" required><br>
+					<?php
+						if ($_GET["mode"] != "manage") {
+						?>
+							Old Password : <input type="password" name="opwd" maxlength="24"
+													style="margin-top:10px; height:25px; width:180px;" required><br>
+						<?php
+						}
+					?>
 					New Password : <input type="password" name="npwd" maxlength="24"
 											style="margin-top:10px; height:25px; width:180px;" required><br>
 					Confirm New Password : <input type="password" name="cpwd" maxlength="24"
@@ -136,14 +145,8 @@
 	 			
 	 			<form name="info" method="post" style="text-align:right;">
 	 				<fieldset>
-	 				<?php
-	 					if ($usr != $_SESSION["usr"]) {
-	 				?>
-					<input type="submit" name="deleteAcc" value="Delete Account" style="margin-top:10px; height:25px; width:180px;">
-					<?php
-						}
-					?>
-					<input type="submit" name="cancel" value="Cancel" style="margin-top:10px; height:25px; width:180px;">
+	 				<input type="submit" name="deleteAcc" value="Delete Account" style=<?php echo '"'.(($type != "a" or $usr == $_SESSION["usr"]) ? "display:none; ":"") .'margin-top:10px; height:25px; width:180px;"'?>>
+					<input type="submit" name="cancel" value="Cancel" formaction=<?php echo '"account.php?mode='.$_GET["mode"].'"'; ?> style="margin-top:10px; height:25px; width:180px;">
 					</fieldset>
 	 			</form>
 	 			</div>
@@ -158,6 +161,128 @@
         oci_close($conn);
     }
     
+    // Creates forms for creating a new account and/or user
+   	function createUserForm() {	
+   			if (isset($_POST["submitAcc"])) {
+   				if ($_POST["npwd"] == $_POST["cpwd"]) {
+   					if (!checkUsedUsername()) {
+	   					if (!checkUsedEmail(null)) {
+	   						if ($pid = createPerson()) {
+		   						if (createUser($pid)) {
+		   							?>
+		   							<h1>
+	         	   						Account sucessfully created
+	        						</h1>
+	        						<?php
+		   							return;
+		   						}
+		   					} 
+	   					} else {
+		   					$_SESSION["infoErr"] = "Email already in use";
+		   				}
+		   			} else {
+		   				$_SESSION["pwdErr"] = "Username already taken";
+		   			}
+	   			} else {
+	   				$_SESSION["pwdErr"] = "Passwords do not match";
+	   			}
+   			}
+        	
+        	// Retrieve types
+        	global $types;
+
+			?>
+				<div style="float:left;">
+				
+				<h1>
+	         	   Account Creation
+	        	</h1>
+
+				<form name="account" method="post" style="text-align:right;">
+					<!-- Hidden person id value -->
+					<input type="hidden" name="pid" id="pid" <?php if (isset($_POST['pid'])) echo 'value="'.$_POST['pid'].'"'; ?>>
+
+					<fieldset>
+					<legend>Personal Info:</legend>
+					<!-- Create a selection for account types -->
+					Account Type : <select name = "class">
+	    								<?php
+											foreach ($types as $key => $class) {
+												// Add every type from types into the selection
+											?>
+												<option <?php echo 'value='.$key.' '.((isset($_POST['class']) and $key == $_POST['class']) ? 'selected': '').''; ?>><?php echo ''.$class.''; ?></option>
+											<?php
+											}
+										?>
+	  									</select><br>
+
+					<!-- Basic personal information -->
+					First Name : <input type="text" name="fname" placeholder="First Name" maxlength="24"
+										<?php if (isset($_POST['fname'])) echo 'value="'.$_POST['fname'].'"'; ?>
+										style="margin-top:10px; height:25px; width:180px;" required><br>
+					Last Name : <input type="text" name="lname" placeholder="Last Name" maxlength="24"
+										<?php if (isset($_POST['lname'])) echo 'value="'.$_POST['lname'].'"'; ?>
+										style="margin-top:10px; height:25px; width:180px;" required><br>
+					Address : <input type="text" name="address" placeholder="Address" maxlength="128"
+										<?php if (isset($_POST['address'])) echo 'value="'.$_POST['address'].'"'; ?>
+										style="margin-top:10px; height:25px; width:180px;"><br>
+					Phone Number : <input type="text" name="phone" placeholder="10 digit phone number" pattern="[0-9]{10}" 
+											<?php if (isset($_POST['phone'])) echo 'value="'.$_POST['phone'].'"'; ?>
+											style="margin-top:10px; height:25px; width:180px;"><br>
+					Email : <input type="email" name="email" placeholder="Email" maxlength="128"
+										<?php if (isset($_POST['email'])) echo 'value="'.$_POST['email'].'"'; ?>
+										style="margin-top:10px; height:25px; width:180px;"><br>
+
+					<div <?php echo 'style='.(isset($_SESSION["infoErr"]) ? "color:red;" : "color:black;").''; ?>>
+		            <?php
+		                if (isset($_SESSION["infoErr"])) {
+		                    echo '' . $_SESSION["infoErr"] . '<br>';
+		                    unset($_SESSION["infoErr"]);
+		                } else if (isset($_SESSION["infoMsg"])) {
+		                	echo '' . $_SESSION["infoMsg"] . '<br>';
+		                    unset($_SESSION["infoMsg"]);
+		                }
+		            ?>
+            		</div>
+					</fieldset>
+
+	 			
+	 				<fieldset>
+	 				<legend>Account Info:</legend>
+					<!-- Ask for old pwd and new pwd twice -->
+					Username : <input type="text" name="usr" maxlength="24"
+											<?php if (isset($_POST['usr'])) echo 'value="'.$_POST['usr'].'"'; ?>
+											style="margin-top:10px; height:25px; width:180px;" required><br>
+					New Password : <input type="password" name="npwd" maxlength="24"
+											style="margin-top:10px; height:25px; width:180px;" required><br>
+					Confirm New Password : <input type="password" name="cpwd" maxlength="24"
+													style="margin-top:10px; height:25px; width:180px;" required><br>
+					            
+					<div <?php echo 'style='.(isset($_SESSION["pwdErr"]) ? "color:red;" : "color:black;").''; ?>>
+		            <?php
+		                if (isset($_SESSION["pwdErr"])) {
+		                    echo '' . $_SESSION["pwdErr"] . '<br>';
+		                    unset($_SESSION["pwdErr"]);
+		                } else if (isset($_SESSION["pwdMsg"])) {
+		                	echo '' . $_SESSION["pwdMsg"] . '<br>';
+		                    unset($_SESSION["pwdMsg"]);
+		                }
+		            ?>
+            		</div>
+					</fieldset>
+
+	 			
+
+	 				<fieldset>
+	 				<input type="submit" name="submitAcc" value="Submit" style="margin-top:10px; height:25px; width:180px;"?>>
+					<input type="button" name="cancel" value="Cancel" onClick="document.location.href='account.php?mode=account'" style="margin-top:10px; height:25px; width:180px;">
+					</fieldset>
+	 			</form>
+	 			</div>
+			<?php
+			obtainPersons(null);
+    }
+
     // Creates form for searching (called when mode == search)
     function searchForm() {
     ?>
@@ -210,7 +335,7 @@
 									echo 'value=', $_GET['edate'];	
 								}
 							?> 
-								style="margin-bottom:10px; height:25px; width:180px;">
+								style="margin-bottom:10px; height:25px; width:180px;"><br>
 
 
 			Sort by :
@@ -282,26 +407,32 @@
 			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
     	</form>
     <?php
-    	if ($_GET["account"] and $_GET["pid"]) {
+    	if (isset($_GET["account"]) and $_GET["account"] and isset($_GET["pid"]) and $_GET["pid"]) {
     		userForm($_GET['account'], $_GET['pid'], $type);
     	} else if (isset($_GET['search'])) {
 			obtainUsers($_GET['usr'], $_GET['fname'], $_GET['lname']);
     	}
     }
 
-		// Creates form for managing family doctors
-    function familyDoctorForm($type) {
+	// Creates form for managing family doctors
+    function familyDoctorForm() {
+    	// Try to update info if previous request was made
+    	if (isset($_GET["pid"]) and $_GET["pid"]) {
+    		if (isset($_GET["rpid"]) and $_GET["rpid"]) deletePatient($_GET["pid"], $_GET["rpid"]);
+    		else if (isset($_GET["apid"])  and $_GET["apid"]) addPatient($_GET["pid"], $_GET["apid"]);
+    	}
     ?>    	
     	<h1>
 			Family Doctor Info
 	  	</h1>
     
-    	<form name="manage" method="get">
-    		<!-- Hidden mode value -->
+    	<form name="doctor" method="get">
+    		<!-- Hidden values -->
     		<input type="hidden" name="mode" value="doctor">
-    		<input type="hidden" name="account" id="account">
     		<input type="hidden" name="pid" id="pid">
-    		
+			<input type="hidden" name="rpid" id="rpid">
+    		<input type="hidden" name="apid" id="apid">
+
     		<!-- Search parameters -->
 			First Name : <input type="text" name="fname" placeholder="First Name" 
 			<?php if (isset($_GET['fname']) and $_GET['fname']) echo 'value='.$_GET['fname'].''; ?>
@@ -314,25 +445,75 @@
     	</form>
     	
     <?php
+    	if (isset($_GET["pid"]) and $_GET["pid"]) {
+    		?>
+    		<div>
+    		<H1>Patient List</H1>
+    		<?php
+    		obtainPatients($_GET['pid']);
+    		?>
+    		</div>
+
+    		<div>
+    		<H1>Add Patients</H1>
+    		<?php
+    		obtainPersons($_GET["pid"]);
+    		?>
+    		</div>
+    		<?php
+    	} else if (isset($_GET['search'])) {
+			obtainDoctors($_GET['fname'], $_GET['lname']);
+    	}
     }
 
-		// Creates form for uploading
-    function uploadForm($type) {
+    // Creates form for record info and upload/editting if user is radiologist
+    function recordForm($type) {
     ?>    	
     	<h1>
-			New Record
-	  	</h1>   
+			<?php echo ((isset($_GET["rid"]) and $_GET["rid"]) ? 'Record '.$_GET["rid"].'' : 'New Record'); ?>
+	  	</h1>
+    
+    	
+    	
+    <?php
+    }
+
+	// Creates form for uploading
+    function uploadForm($type) {
+    	if (isset($_FILES["uploadedPics"])) {
+    		for ($i = 0; isset($_FILES["uploadedPics"]["name"][$i]); $i++) {
+    			uploadPic(0, $_FILES["uploadedPics"]["tmp_name"][$i], pathinfo(basename($_FILES["uploadedPics"]["name"][$i]),PATHINFO_EXTENSION));
+    		}
+    	}
+    ?>    	 
+	  	<form method="post" enctype="multipart/form-data">
+	  	<!-- Hidden values -->
+    	<input type="hidden" name="mode" value="upload">
+    		
+	  	<legend>Upload Pictures: </legend>
+	  	<input type="file" name="uploadedPics[]" multiple>
+	  	<fieldset style="height:500px; width:500px; overflow:auto;">
+
+	  	
+	  	</fieldset>
+
+	<div style="float:right;">
+		<input type="submit" name="submit" value="Upload" style="margin-top:10px; height:25px; width:180px;">
+		<input type="submit" name="cancel" value="Cancel" style="margin-top:10px; height:25px; width:180px;">
+	</div>
+		</form>
+		
     <?php
     }
 
    	// Creates form for generating a report
-    function generateForm($type) {
+    function generateForm() {
     ?>
 		<h1>
 	  		Report Generator
 	   </h1>    
     
-    	<form name="search" method="get">
+    	<form name="generate" method="get">
     		<!-- Hidden mode value -->
     		<input type="hidden" name="mode" value="generate">
 
@@ -378,13 +559,19 @@
 			$sdate = stringToDate($_GET["sdate"]);
 			$edate = stringToDate($_GET["edate"]);
 			
-			report_generating($_GET['diagnosis'], ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null));
+			if ($sdate and $edate) {
+				report_generating($_GET['diagnosis'], ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null));
+			} else {
+				?>
+					<div style="color:red;">
+						Please input valid dates
+					</div>	
+				<?php	
+			}
     	}
     }
 
    	// Creates form for data analysis
-   	// Creates form for data analysis
-   	
     function analysisForm() {
     ?>
     
@@ -396,13 +583,19 @@
     		<!-- Hidden mode value -->
     		<input type="hidden" name="mode" value="analysis">
     		
+    		<!-- Search parameters --> 
+			Include Patient Name ?  <input type="text" name="fname" placeholder="" 
+			<?php if (isset($_GET['fname']) and $_GET['fname']) echo 'value='.$_GET['fname'].''; ?>
+			style="margin-bottom:10px; height:25px; width:180px;"> <br>
 
-
-			<input type="checkbox" name="fname" value="A" />Patient Name<br />
-			<input type="checkbox" name="test_type" value="B" />Test Type<br />
+			Include Test Type ?     <input type="text" name="test_type" placeholder="" 
+			<?php if (isset($_GET['test_type']) and $_GET['test_type']) echo 'value='.$_GET['test_type'].''; ?>
+			style="margin-bottom:10px; height:25px; width:180px;"> <br>
 			
+    		<!-- Start of date range for test date -->
+    		
 
-�			
+								
 						<label id="timeperiodlabel" for="timeperiod:">Time Period: </label><select name="timeperiod" id="timeperiod">
 	        					<option value="a">All</option>
     	    						<option value="w">Weekly</option>
@@ -416,10 +609,12 @@
     	</form>
     <?php
     	if (isset($_GET['analysis'])) {
-
-			//echo 'value!!!!!!!!!!!!!!!=', $_GET['checkbox1'];	
-			data_analysis($_GET['fname'], $_GET['test_type'],$_GET['timeperiod']);
-
+    		$sdate = stringToDate($_GET["sdate"]);
+			$edate = stringToDate($_GET["edate"]);
+			//echo 'value!!!!!!!!!!!!!!!=', $_GET['timeperiod'];	
+			data_analysis($_GET['fname'], $_GET['lname'], $_GET['test_type'],($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null),$_GET['timeperiod']);
+			//echo 'information : ',$_GET['fname'];
+			//echo 'information : ',$_GET['sdate'];
     	}
     	}
     // Creates form for logging out
@@ -432,7 +627,8 @@
     <?php
     }
 	
-	 function obtainUsers($usr, $fname, $lname) {
+	// Creates table of all users satisfying search parameters
+	function obtainUsers($usr, $fname, $lname) {
 	 	// Establish connection
     	$conn = connect();
 		if (!$conn) {
@@ -505,6 +701,228 @@
         oci_close($conn);
 	 }
 
+	// Creates table of all users satisfying search parameters
+	function obtainDoctors($fname, $lname) {
+	 	// Establish connection
+    	$conn = connect();
+		if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
+
+        // 
+
+        // Sql command
+        $sql = 'SELECT u.class, u.person_id, p.first_name, p.last_name
+        		FROM users u, persons p 
+        		WHERE u.person_id = p.person_id AND u.class = \'d\'';
+
+			if ($fname) $sql = ''.$sql.' AND LOWER(p.first_name) LIKE \'%'.strtolower($fname).'%\'';
+			if ($lname) $sql = ''.$sql.' AND LOWER(p.last_name) LIKE \'%'.strtolower($lname).'%\'';
+		
+			$sql = ''.$sql.' ORDER BY p.first_name, p.last_name, u.person_id'; 
+
+        // Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res = oci_execute($stid);
+        
+        if (!$res) {
+        	// Error, retrieve the error using the oci_error() function & output an error message
+     	   	$err = oci_error($stid);
+     	   	echo htmlentities($err['message']);
+        } else {
+        	// No error
+        	// Fetch and output info
+        	global $types; 
+        	if ($info = oci_fetch_array($stid)) {
+        	?>
+        		<div style="display:inline-block; height:600px; overflow:auto;">
+	        		<table border="1">
+	        			<th width="100" align="center" valign="middle">ID</th>
+	        			<th width="100" align="center" valign="middle">First Name</th>
+	        			<th width="100" align="center" valign="middle">Last Name</th>
+	        	<?php
+	        		while ($info) {
+	        		?>
+	        			<tr <?php echo 'onclick="selectDoctor(\''.$info["PERSON_ID"].'\')"'; ?>
+	        				onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'">
+							<td align="center" valign="middle"><?php echo $info["PERSON_ID"]; ?></td>	
+							<td><?php echo $info["FIRST_NAME"]; ?></td>
+							<td><?php echo $info["LAST_NAME"]; ?></td>	
+						</tr>
+	        		<?php
+	        			$info = oci_fetch_array($stid);
+					}
+				?>
+					</table>
+				</div>
+			<?php
+			} else {
+				// Error message for having no matching results
+			?>
+				<div style="color:red;">
+					No matching results
+				</div>		
+			<?php
+			}
+        }
+        	
+        // Free the statement identifier when closing the connection
+        oci_free_statement($stid);
+        oci_close($conn);
+	 }
+
+	 	// Creates table of all users satisfying search parameters
+	function obtainPatients($pid) {
+	 	// Establish connection
+    	$conn = connect();
+		if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
+
+        // Sql command
+        $sql = 'SELECT p.person_id, p.first_name, p.last_name
+        		FROM family_doctor fd, persons p
+        		WHERE p.person_id = fd.patient_id AND fd.doctor_id = '.$pid.'';
+		
+
+        // Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res = oci_execute($stid);
+        
+        if (!$res) {
+        	// Error, retrieve the error using the oci_error() function & output an error message
+     	   	$err = oci_error($stid);
+     	   	echo htmlentities($err['message']);
+        } else {
+        	// No error
+        	// Fetch and output info
+        	global $types; 
+        	if ($info = oci_fetch_array($stid)) {
+        	?>
+        		<div style="display:inline-block; height:600px; overflow:auto;">
+	        		<table border="1">
+	        			<th width="100" align="center" valign="middle">ID</th>
+	        			<th width="100" align="center" valign="middle">First Name</th>
+	        			<th width="100" align="center" valign="middle">Last Name</th>
+	        			<th width="100" align="center" valign="middle"></th>
+	        	<?php
+	        		while ($info) {
+	        		?>
+	        			<tr onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'">
+							<td align="center" valign="middle"><?php echo $info["PERSON_ID"]; ?></td>	
+							<td><?php echo $info["FIRST_NAME"]; ?></td>
+							<td><?php echo $info["LAST_NAME"]; ?></td>	
+							<td>
+								<input type="button" name="remove" id="remove" value="Remove" 
+										<?php echo 'onclick="removePatient(\''.$pid.'\', \''.$info["PERSON_ID"].'\', \''.$info["FIRST_NAME"].'\', \''.$info["LAST_NAME"].'\')"'; ?>
+										style="width:100%;">
+							</td>
+						</tr>
+	        		<?php
+	        			$info = oci_fetch_array($stid);
+					}
+				?>
+					</table>
+				</div>
+			<?php
+			} else {
+				// Error message for having no matching results
+			?>
+				<div style="color:red;">
+					No matching results
+				</div>		
+			<?php
+			}
+        }
+        	
+        // Free the statement identifier when closing the connection
+        oci_free_statement($stid);
+        oci_close($conn);
+	 }
+
+	 	 	// Creates table of all users satisfying search parameters
+	function obtainPersons($pid) {
+	 	// Establish connection
+    	$conn = connect();
+		if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
+
+        // Sql command
+        if ($pid)
+        $sql = 'SELECT p.person_id, p.first_name, p.last_name
+        		FROM family_doctor fd, persons p
+        		WHERE p.person_id = fd.patient_id AND p.person_id != '.$pid.'
+        		MINUS         
+        		SELECT p.person_id, p.first_name, p.last_name
+        		FROM family_doctor fd, persons p
+        		WHERE p.person_id = fd.patient_id AND fd.doctor_id = '.$pid.'';
+		else $sql = "SELECT p.person_id, p.first_name, p.last_name FROM persons p";
+
+        // Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res = oci_execute($stid);
+        
+        if (!$res) {
+        	// Error, retrieve the error using the oci_error() function & output an error message
+     	   	$err = oci_error($stid);
+     	   	echo htmlentities($err['message']);
+        } else {
+        	// No error
+        	// Fetch and output info
+        	global $types; 
+        	if ($info = oci_fetch_array($stid)) {
+        	?>
+        		<div style="display:inline-block; height:600px; overflow:auto;">
+	        		<table border="1">
+	        			<th width="100" align="center" valign="middle">ID</th>
+	        			<th width="100" align="center" valign="middle">First Name</th>
+	        			<th width="100" align="center" valign="middle">Last Name</th>
+	        			<th width="100" align="center" valign="middle"></th>
+	        	<?php
+	        		while ($info) {
+	        		?>
+	        			<tr onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'">
+							<td align="center" valign="middle"><?php echo $info["PERSON_ID"]; ?></td>	
+							<td><?php echo $info["FIRST_NAME"]; ?></td>
+							<td><?php echo $info["LAST_NAME"]; ?></td>	
+							<td>
+								<input type="button" name="addPatient" id="addPatient" value="Add" 
+										<?php echo 'onclick="addPatient(\''.$pid.'\', \''.$info["PERSON_ID"].'\', \''.$info["FIRST_NAME"].'\', \''.$info["LAST_NAME"].'\')"'; ?>
+										style="width:100%;">
+							</td>
+						</tr>
+	        		<?php
+	        			$info = oci_fetch_array($stid);
+					}
+				?>
+					</table>
+				</div>
+			<?php
+			} else {
+				// Error message for having no matching results
+			?>
+				<div style="color:red;">
+					No matching results
+				</div>		
+			<?php
+			}
+        }
+        	
+        // Free the statement identifier when closing the connection
+        oci_free_statement($stid);
+        oci_close($conn);
+	 }
+
     // Returns an array of all the types of diagnosis
     function diagnosisArray() {
     	// Establish connection
@@ -540,8 +958,8 @@
 ?>
 
 <script>
-	// Set up a global variable for diagnosisArray
-	var diagnosisArray = new array(); 
+	// Declare global arrays
+	var diagnosisArray; 
 
 	// Adds another text input into the dynamic list of keywords
 	function addKeyword() {
@@ -550,12 +968,38 @@
 		document.getElementById('keywordsList').appendChild(newdiv);
 	}			
 
+	// Selects user account from clicking on table entry
 	function selectUser(user_name, person_id) {
 		document.getElementById('account').value = user_name;
 		document.getElementById('pid').value = person_id;
 		document.forms['manage'].submit()
 	}
 
+	// Selects user account from clicking on table entry
+	function selectDoctor(person_id) {
+		document.getElementById('pid').value = person_id;
+		document.forms['doctor'].submit()
+	}
+	
+	// Selects a patient to be removed after confirmation
+	function removePatient (doctor_id, patient_id, first_name, last_name) {
+		if (confirm("Are you should you want to remove patient " + first_name + " " + last_name + "?")) {
+			document.getElementById('pid').value = doctor_id;
+			document.getElementById('rpid').value = patient_id;
+			document.forms['doctor'].submit();
+		} 
+	}
+
+		// Selects a patient to be removed after confirmation
+	function addPatient (doctor_id, patient_id, first_name, last_name) {
+		if (confirm("Are you should you want to add patient " + first_name + " " + last_name + "?")) {
+			document.getElementById('pid').value = doctor_id;
+			document.getElementById('apid').value = patient_id;
+			document.forms['doctor'].submit();
+		} 
+	}
+
+	// Updates diagnosis data list
 	function updateDiagnosisList(event) {
 		// Grab keycode
 		var x = event.which || event.keyCode;
@@ -590,6 +1034,7 @@
 	    }
 	}
 
+	// Filter diagnosis array
 	function isLike(element) {
 		// Obtain current diagnosis value
 		var diagnosis = document.getElementById('diagnosis');
@@ -604,6 +1049,7 @@
 	  	}
 	}
 
+	// Sort diagnosis array
 	function isFirst(a, b) {
 		// Obtain current diagnosis value
 		var diagnosis = document.getElementById('diagnosis');

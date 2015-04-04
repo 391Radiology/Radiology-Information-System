@@ -5,6 +5,7 @@
 	$modes = array(
 			'account' => 'Account Info',
 			'search' => 'Search',
+			'create' => 'New User',
 			'manage' => 'Manage Users',
 			'doctor' => 'Family Doctor Info',
 			'upload' => 'New Record',
@@ -59,6 +60,7 @@
 					if (isset($_GET["mode"]) and array_key_exists($_GET["mode"], $modes)) {
 						// Valid mode	
 					?>
+						 
 						<div style="background-color:rgba(173, 216, 230, 0.75); text-align:right;">
 						<?php
 							// Create logout form
@@ -77,14 +79,21 @@
 					<?php
 						// Create forms based on mode
 						if ($_GET["mode"] == "account") userForm($_SESSION["usr"], $_SESSION["pid"], $type);
-						else if ($_GET["mode"] == "search") searchForm();
-						else if ($_GET["mode"] == "manage") manageForm($type);
-						else if 	($_GET["mode"] == "doctor") familyDoctorForm($type);
-						else if ($_GET["mode"] == "generate") generateForm($type);
-						else if ($_GET["mode"] == "analysis") analysisForm();
-						else if ($_GET["mode"] == "upload") uploadForm($type);
+						else if ($_GET["mode"] == "search" and ($type == "r" or !(isset($_GET["rid"]) and $_GET["rid"]))) searchForm();
+						else if ($_GET["mode"] == "manage" and $type == "a") manageForm($type);
+						else if ($_GET["mode"] == "doctor" and $type == "a") familyDoctorForm($type);
+						else if ($_GET["mode"] == "generate" and $type == "a") generateForm($type);
+						else if ($_GET["mode"] == "analysis" and $type == "a") analysisForm();
+						else if ($_GET["mode"] == "create" and $type == "a") createUserForm();
+						else if ($_GET["mode"] == "upload" and 
+								($type == "r" or ($type == "a" and isset($_GET["rid"]) and $_GET["rid"]))) recordForm($type);
+						else {
+							// Insufficient privileges
+							echo "Insufficient privileges";
+						}
 					?>
-						<div>
+						</div>
+						
 					<?php
 					} else {
 						// Nonvalid mode

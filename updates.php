@@ -46,7 +46,7 @@
 
 	        // Sql command
 	        $sql = 'SELECT * FROM persons p, users u 
-	        		WHERE p.person_id = u.person_id AND p.email = \''.$_POST["email"].'\'';
+	        		WHERE p.person_id = u.person_id AND LOWER(p.email) = \''.strToLower($_POST["email"]).'\'';
 	        if ($pid) $sql = ''.$sql.' AND p.person_id != '.$pid.'';
 
 	        // Prepare sql using conn and returns the statement identifier
@@ -63,7 +63,7 @@
 	        	// No error
 	        	// See if there was any results
 	        	$row = oci_fetch_array($stid);
-	        	echo $row[0];
+	        	
 	        }
 
 	        // Free the statement identifier when closing the connection
@@ -153,6 +153,59 @@
 	        oci_close($conn);
 
 	        return $res;
+	}
+	
+	// Inserts a radioloy record entry
+	function createRecord($patient, $doctor, $radiologist, $sdate, $edate) {
+	    	// Establish connection
+	        $conn = connect();
+	        if (!$conn) {
+	            $e = oci_error();
+	            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+	        }
+
+	        // Sql command
+	        $sql = 'SELECT record_id.NEXTVAL FROM DUAL';
+
+	        // Prepare sql using conn and returns the statement identifier
+	        $stid = oci_parse($conn, $sql);
+
+	        // Execute a statement returned from oci_parse()
+	        $res = oci_execute($stid, OCI_DEFAULT);
+
+	        if (!$res) {
+	        	// Error, retrieve the error using the oci_error() function & output an error message
+	     	   	$err = oci_error($stid);
+	     	   	echo htmlentities($err['message']);
+	        } else {
+	        	// No error
+	        	if ($id = oci_fetch_array($stid)) {
+	        		// Obtained unique person id
+	        		// Sql command
+	        		$sql = 'INSERT INTO radiology_record VALUES ('.$id[0].', '.$patient.', '.$doctor.', 
+	        				'.$radiologist.', \''.$_POST["testType"].'\', \''.$sdate.'\', \''.$edate.'\', \''.$_POST["diagnosis"].'\', \''.$_POST["description"].'\')';
+
+					// Prepare sql using conn and returns the statement identifier
+			        $stid = oci_parse($conn, $sql);
+
+			        // Execute a statement returned from oci_parse()
+	        		$res = oci_execute($stid, OCI_DEFAULT);
+
+	        		if (!$res) {
+	        			// Error, retrieve the error using the oci_error() function & output an error message
+	     	   			$err = oci_error($stid);
+	     	   			echo htmlentities($err['message']);
+	     	   			oci_rollback($conn);
+	        		} else {
+	        			oci_commit($conn);
+	        		}
+	        	}
+        	}
+
+	        // Free the statement identifier when closing the connection
+	        oci_free_statement($stid);
+	        oci_close($conn);
+	        return $id[0];
 	}
 
 	// Updates an account
@@ -413,7 +466,7 @@
 									FROM pacs_images 
 	   								WHERE record_id = '.$rid.' AND image_id = '.$iid.'
 	    							FOR UPDATE';
-
+		
 	    					// Prepare sql using conn and returns the statement identifier
 		        			$stid = oci_parse($conn, $sql);
 

@@ -199,14 +199,12 @@
 	         	   Account Creation
 	        	</h1>
 
-				<form name="account" method="post" style="text-align:right;">
-					<!-- Hidden person id value -->
-					
+				<form name="account" method="post" style="text-align:right;"doctor>
 
 					<fieldset>
 					<legend>Personal Info:</legend>
 					<!-- Create a selection for account types -->
-					PID: <input type="text" name="pid" id="pid" <?php if (isset($_POST['pid'])) echo 'value="'.$_POST['pid'].'"'; ?> readonly><br>
+					PID: <input type="number" name="pid" id="pid" <?php if (isset($_POST['pid'])) echo 'value="'.$_POST['pid'].'"'; ?> readonly><br>
 					Account Type : <select name = "class">
 	    								<?php
 											foreach ($types as $key => $class) {
@@ -276,7 +274,7 @@
 	 			
 
 	 				<fieldset>
-	 				<input type="submit" name="submitAcc" value="Submit" style="margin-top:10px; height:25px; width:180px;"?>>
+	 				<input type="submit" name="submitAcc" value="Submit" style="margin-top:10px; height:25px; width:180px;"?>
 					<input type="button" name="cancel" value="Cancel" onClick="document.location.href='account.php?mode=account'" style="margin-top:10px; height:25px; width:180px;">
 					</fieldset>
 	 			</form>
@@ -449,14 +447,14 @@
     <?php
     	if (isset($_GET["pid"]) and $_GET["pid"]) {
     		?>
-    		<div>
+    		<div style="display:inline-block; float:left;">
     		<H1>Patient List</H1>
     		<?php
     		obtainPatients($_GET['pid']);
     		?>
     		</div>
 
-    		<div>
+    		<div style="display:inline-block; float:right;">
     		<H1>Add Patients</H1>
     		<?php
     		obtainPersons($_GET["pid"]);
@@ -471,13 +469,35 @@
     // Creates form for record info and upload/editting
     function recordForm($type) {
 
-    	
-
+		// Create/retrieve record
+    	if (isset($_POST["submit"])) {
+    		if ($_POST["rid"]) {
+    			$rid = $_POST["rid"];
+    		} else {
+    			if ($_POST["patient"] and $_POST["doctor"] and $_POST["radiologist"]) {
+	    			$sdate = stringToDate($_POST["sdate"]);
+					$edate = stringToDate($_POST["edate"]);
+					if ($edate and $sdate) {
+						$rid = createRecord($_POST["patient"], $_POST["doctor"], $_POST["radiologist"], dateToString($sdate), dateToString($edate));
+					} else {
+						$_SESSION["err"] = "Invalid dates";
+					}
+				} else {
+					$_SESSION["err"] = "Please select the parties involved";
+				}
+    			
+    		}
+    		// Add pics to record
     	if (isset($_FILES["uploadedPics"])) {
+    		// If there are images to be added 
     		for ($i = 0; isset($_FILES["uploadedPics"]["name"][$i]); $i++) {
     			uploadPic(0, $_FILES["uploadedPics"]["tmp_name"][$i], pathinfo(basename($_FILES["uploadedPics"]["name"][$i]),PATHINFO_EXTENSION));
     		}
     	}
+    		
+    	}
+		
+		
     ?>    	
     	<div style="float:left;">
 
@@ -486,47 +506,71 @@
 	  	</h1>
 
 	  	<form name="record" method="post" enctype="multipart/form-data">
-	  	<!-- Hidden mode -->
+	  	<!-- Hidden mode value -->
 	  	<input type="hidden" name="mode" value="upload">
+		
 
 	  	<!-- Start of date range for test date -->
 			Start Date : <input type="date" name="sdate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}" 
 							<?php
-					       		if (isset($_GET['sdate']) and DateTime::createFromFormat('Y-m-j', $_GET['sdate'])) {
+					       		if (isset($_POST['sdate']) and DateTime::createFromFormat('Y-m-j', $_POST['sdate'])) {
 					       			// If there's a valid start date then set value of input to the submitted date
-					       			echo 'value=', $_GET['sdate'];
+					       			echo 'value=', $_POST['sdate'];
 								}
 							?> 
-								style="margin-bottom:10px; height:25px; width:180px;">
+								style="margin-bottom:10px; height:25px; width:180px;" required>
 
 			<!-- End of date range for test date -->
 			End Date : <input type="date" name="edate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}"
 							<?php
-								if (isset($_GET['edate']) and DateTime::createFromFormat('Y-m-j', $_GET['edate'])) {
+								if (isset($_POST['edate']) and DateTime::createFromFormat('Y-m-j', $_POST['edate'])) {
 									// If there's a valid end date then set value of input to the submitted date
-									echo 'value=', $_GET['edate'];	
+									echo 'value=', $_POST['edate'];	
 								}
 							?> 
-								style="margin-bottom:10px; height:25px; width:180px;">
-			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
+								style="margin-bottom:10px; height:25px; width:180px;" required>
+			<input type="submit" name="submit" value="Submit" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;" required><br>
 	  		Test Type : <input type="text" name="testType" placeholder="Test Type" 
-    		<?php if (isset($_GET['testType']) and $_GET['testType']) echo 'value='.$_GET['testType'].''; ?>
-    		style="margin-bottom:10px; height:25px; width:180px;"> 
+    		<?php if (isset($_POST['testType']) and $_POST['testType']) echo 'value='.$_POST['testType'].''; ?>
+    		style="margin-bottom:10px; height:25px; width:180px;" required> 
     		Diagnosis : <input type="text" name="diagnosis" placeholder="Test Type" 
-    		<?php if (isset($_GET['testType']) and $_GET['testType']) echo 'value='.$_GET['testType'].''; ?>
-    		style="margin-bottom:10px; height:25px; width:180px;"> 
+    		<?php if (isset($_POST['diagnosis']) and $_POST['diagnosis']) echo 'value='.$_POST['diagnosis'].''; ?>
+    		style="margin-bottom:10px; height:25px; width:180px;" required> 
+    		<div style="color:red;">
+		            <?php
+		                if (isset($_SESSION["err"])) {
+		                    echo '' . $_SESSION["err"] . '<br>';
+		                    unset($_SESSION["err"]);
+		                }
+		            ?>
+            		</div>
+            		<div style="display:inline-block;">
+            			<?php patientSelector(); ?><br>
+        	  				<input type="number" name="patient" id="patient" placeholder="Patient ID" <?php if (isset($_POST['patient']) and $_POST['patient']) echo 'value='.$_POST['patient'].''; ?> style="width:100%;" required readonly>
+        	  				
+        	  	</div>
+        	  	<div style="display:inline-block;">
+            			<?php doctorSelector(); ?><br>
+		<input type="number" name="doctor" id="doctor" placeholder="Doctor ID" <?php if (isset($_POST['doctor']) and $_POST['doctor']) echo 'value='.$_POST['doctor'].''; ?> style="width:100%;" required readonly>
+		</div>
+		<div style="display:inline-block;">
+            			<?php radiologistSelector(); ?><br>
+		<input type="number" name="radiologist" id="radiologist" placeholder="Radiologist ID" <?php if (isset($_POST['radiologist']) and $_POST['radiologist']) echo 'value='.$_POST['radiologist'].''; ?> style="width:100%;" required readonly>
+		</div>
     			  	<legend>Upload Pictures: </legend>
 	  					<input type="file" name="uploadedPics[]" id="uploadedPics" onChange="updatePreview()" multiple>
 	  	<div style="float:right;">
 		
 	</div>
-
-	  	</form>
-
-	  	<textarea name="description" form="record" placeholder="Description" style="padding: 10px 10px 10px 10px; height: 300px; width:100%; overflow:auto;"></textarea>
+	
+	
+		  	<textarea name="description" placeholder="Description" <?php if (isset($_POST['description']) and $_POST['description']) echo 'value='.$_POST['description'].''; ?> style="padding: 10px 10px 10px 10px; height: 200px; width:100%; overflow:auto;" required></textarea>
 	  	<div id="pics" style="height:200px; width:100%, overflow:auto;">
 	  		
     	</div>
+	  	</form>
+
+
     	
     	
     <?php
@@ -611,17 +655,17 @@
     		
 
 
-			<input type="checkbox" name="fname" value="A" />Patient Name<br />
-			<input type="checkbox" name="test_type" value="B" />Test Type<br />
+			<input type="checkbox" name="fname" value="A" <?php if (isset($_GET["fname"])) echo "checked"; ?>/>Patient Name<br />
+			<input type="checkbox" name="test_type" value="B" <?php if (isset($_GET["test_type"])) echo "checked"; ?>/>Test Type<br />
 			
 
 �			
 						<label id="timeperiodlabel" for="timeperiod:">Time Period: </label><select name="timeperiod" id="timeperiod">
 	        					<option value="a">Daily</option>
-    	    						<option value="w">Weekly</option>
-    	    						<option value="m">Monthly</option>
-    	    						<option value="y">Yearly</option>
-    	    						<option value="n">None</option>
+    	    						<option value="w" <?php if (isset($_GET["timeperiod"]) and $_GET["timeperiod"] == "w") echo "selected"; ?>>Weekly</option>
+    	    						<option value="m" <?php if (isset($_GET["timeperiod"]) and $_GET["timeperiod"] == "m") echo "selected"; ?>>Monthly</option>
+    	    						<option value="y" <?php if (isset($_GET["timeperiod"]) and $_GET["timeperiod"] == "y") echo "selected"; ?>>Yearly</option>
+    	    						<option value="n" <?php if (isset($_GET["timeperiod"]) and $_GET["timeperiod"] == "n") echo "selected"; ?>>None</option>
     						</select></br></br>
 			
 			
@@ -640,6 +684,7 @@
     ?>
 
     	<form name="logout" action="logout.php" style="margin-bottom:0px; border-bottom-width:0px;">
+    		<input type="submit" id="help" value="Help" formaction="documentation.php" style="height:25px; width:180px;">	
     		<input type="submit" name="logout" value="Logout" style="height:25px; width:180px;">	
 		</form>
     <?php
@@ -865,7 +910,7 @@
 	 }
 
 	 	 	// Creates table of all users satisfying search parameters
-	function obtainPersons($pid) {
+	function obtainPersons($pid=null) {
 	 	// Establish connection
     	$conn = connect();
 		if (!$conn) {
@@ -986,6 +1031,218 @@
 
         return $diagnosisArray;
     }
+    
+    function patientSelector() {
+    	// Establish connection
+    	$conn = connect();
+		if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
+
+        // Sql command
+
+        $sql = 'SELECT p.person_id, p.first_name, p.last_name
+        				FROM persons p';
+
+        // Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res = oci_execute($stid);
+        
+        if (!$res) {
+        	// Error, retrieve the error using the oci_error() function & output an error message
+     	   	$err = oci_error($stid);
+     	   	echo htmlentities($err['message']);
+        } else {
+        	// No error
+        	// Fetch and output info
+
+        	if ($info = oci_fetch_array($stid)) {
+        	?>
+        		<div style="display:inline-block; height:600px; overflow:auto;">
+	        		<table border="1">
+	        			<th width="100" align="center" valign="middle">ID</th>
+	        			<th width="100" align="center" valign="middle">First Name</th>
+	        			<th width="100" align="center" valign="middle">Last Name</th>
+
+	        			
+	        	<?php
+	        	
+	        		while ($info) {
+	        		?>
+	        			<tr onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'" <?php echo 'onClick="selectPatient(\''.$info["PERSON_ID"].'\')"'; ?>>
+							<td align="center" valign="middle"><?php echo $info["PERSON_ID"]; ?></td>	
+							<td><?php echo $info["FIRST_NAME"]; ?></td>
+							<td><?php echo $info["LAST_NAME"]; ?></td>	
+							<?php
+							
+							?>
+						</tr>
+	        		<?php
+	        			$info = oci_fetch_array($stid);
+					}
+				?>
+					</table>
+				</div>
+			<?php
+			} else {
+				// Error message for having no matching results
+			?>
+				<div style="color:red;">
+					No matching results
+				</div>		
+			<?php
+			}
+        }
+        	
+        // Free the statement identifier when closing the connection
+        oci_free_statement($stid);
+        oci_close($conn);
+    }
+    
+    function doctorSelector() {
+    	// Establish connection
+    	$conn = connect();
+		if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
+
+        // Sql command
+
+        $sql = 'SELECT p.person_id, p.first_name, p.last_name
+        				FROM persons p, users u
+        				WHERE p.person_id = u.person_id AND u.class = \'d\'';
+
+        // Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res = oci_execute($stid);
+        
+        if (!$res) {
+        	// Error, retrieve the error using the oci_error() function & output an error message
+     	   	$err = oci_error($stid);
+     	   	echo htmlentities($err['message']);
+        } else {
+        	// No error
+        	// Fetch and output info
+
+        	if ($info = oci_fetch_array($stid)) {
+        	?>
+        		<div style="display:inline-block; height:600px; overflow:auto;">
+	        		<table border="1">
+	        			<th width="100" align="center" valign="middle">ID</th>
+	        			<th width="100" align="center" valign="middle">First Name</th>
+	        			<th width="100" align="center" valign="middle">Last Name</th>
+
+	        			
+	        	<?php
+	        	
+	        		while ($info) {
+	        		?>
+	        			<tr onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'" <?php echo 'onClick="selectADoctor(\''.$info["PERSON_ID"].'\')"'; ?>>
+							<td align="center" valign="middle"><?php echo $info["PERSON_ID"]; ?></td>	
+							<td><?php echo $info["FIRST_NAME"]; ?></td>
+							<td><?php echo $info["LAST_NAME"]; ?></td>	
+							<?php
+							
+							?>
+						</tr>
+	        		<?php
+	        			$info = oci_fetch_array($stid);
+					}
+				?>
+					</table>
+				</div>
+			<?php
+			} else {
+				// Error message for having no matching results
+			?>
+				<div style="color:red;">
+					No matching results
+				</div>		
+			<?php
+			}
+        }
+        	
+        // Free the statement identifier when closing the connection
+        oci_free_statement($stid);
+        oci_close($conn);
+    }
+    
+    function radiologistSelector() {
+    	// Establish connection
+    	$conn = connect();
+		if (!$conn) {
+            $e = oci_error();
+            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+        }
+
+        // Sql command
+
+        $sql = 'SELECT p.person_id, p.first_name, p.last_name
+        				FROM persons p, users u
+        				WHERE p.person_id = u.person_id AND u.class = \'r\'';
+
+        // Prepare sql using conn and returns the statement identifier
+        $stid = oci_parse($conn, $sql);
+
+        // Execute a statement returned from oci_parse()
+        $res = oci_execute($stid);
+        
+        if (!$res) {
+        	// Error, retrieve the error using the oci_error() function & output an error message
+     	   	$err = oci_error($stid);
+     	   	echo htmlentities($err['message']);
+        } else {
+        	// No error
+        	// Fetch and output info
+
+        	if ($info = oci_fetch_array($stid)) {
+        	?>
+        		<div style="display:inline-block; height:600px; overflow:auto;">
+	        		<table border="1">
+	        			<th width="100" align="center" valign="middle">ID</th>
+	        			<th width="100" align="center" valign="middle">First Name</th>
+	        			<th width="100" align="center" valign="middle">Last Name</th>
+
+	        			
+	        	<?php
+	        	
+	        		while ($info) {
+	        		?>
+	        			<tr onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'" <?php echo 'onClick="selectRadiologist(\''.$info["PERSON_ID"].'\')"'; ?>>
+							<td align="center" valign="middle"><?php echo $info["PERSON_ID"]; ?></td>	
+							<td><?php echo $info["FIRST_NAME"]; ?></td>
+							<td><?php echo $info["LAST_NAME"]; ?></td>	
+							<?php
+							
+							?>
+						</tr>
+	        		<?php
+	        			$info = oci_fetch_array($stid);
+					}
+				?>
+					</table>
+				</div>
+			<?php
+			} else {
+				// Error message for having no matching results
+			?>
+				<div style="color:red;">
+					No matching results
+				</div>		
+			<?php
+			}
+        }
+        	
+        // Free the statement identifier when closing the connection
+        oci_free_statement($stid);
+        oci_close($conn);
+    }
 ?>
 
 <script>
@@ -1003,6 +1260,19 @@
 		document.getElementById('pid').value = "";
 	}
 
+
+	function selectPatient(patientID) {
+		document.getElementById('patient').value = patientID;
+	}
+	
+	function selectADoctor(doctorID) {
+		document.getElementById('doctor').value = doctorID;
+	}
+	
+	function selectRadiologist(radiologistID) {
+		document.getElementById('radiologist').value = radiologistID;
+	}
+		
 	// Selects person from clicking on table entry
 	function selectPerson(person_id, first_name, last_name, address, phone, email) {
 		document.getElementById('pid').value = person_id;

@@ -129,7 +129,7 @@ for i in range(len(first_names)):
         if i != 0:
                 for x in [y for y in range(len(first_names)) if y != i and y != 0 and y%2 == 0]:
                         output.write("Insert into radiology_record values (" + \
-                                 str(count) + ", " + \
+                                 "record_id.NEXTVAL" + ", " + \
                                  str(i) + ", " + \
                                  str(x) + ", " + \
                                  str(0) + ", " + \

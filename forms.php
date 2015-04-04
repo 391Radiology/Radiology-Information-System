@@ -67,7 +67,7 @@
 					<legend>Update Info:</legend>
 					<!-- Create a selection for account types -->
 
-					Account Type : <select name = "class">
+					Account Type : <select name = "class" <?php if(($type != "a") or $usr == $_SESSION["usr"]) echo "disabled"; ?>>
 	    								<?php
 											foreach ($types as $key => $class) {
 												// Add every type from types into the selection
@@ -172,7 +172,7 @@
 		   						if (createUser($pid)) {
 		   							?>
 		   							<h1>
-	         	   						Account sucessfully created
+	         	   						Account successfully created
 	        						</h1>
 	        						<?php
 		   							return;
@@ -231,7 +231,7 @@
 					Phone Number : <input type="text" name="phone" id="phone" placeholder="10 digit phone number" pattern="[0-9]{10}" 
 											<?php if (isset($_POST['phone'])) echo 'value="'.$_POST['phone'].'"'; ?>
 											style="margin-top:10px; height:25px; width:180px;" onChange="res()"><br>
-					Email : <input type="email" name="email" placeholder="Email" maxlength="128"
+					Email : <input type="email" name="email" id="email" placeholder="Email" maxlength="128"
 										<?php if (isset($_POST['email'])) echo 'value="'.$_POST['email'].'"'; ?>
 										style="margin-top:10px; height:25px; width:180px;" onChange="res()"><br>
 
@@ -370,7 +370,7 @@
 						($edate ? 'End Date: '.dateToString($edate).'<br>': '');
 
 				// Call search_keyword with search string and formatted date strings (null if not it was not a valid date to begin with)
-				//search_keyword($search, ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null), $_GET["sortBy"], $_GET["orderBy"]);
+				search_keyword($search, ($sdate ? dateToString($sdate) : null), ($edate ? dateToString($edate) : null), $_GET["sortBy"], $_GET["orderBy"]);
 			} else {
 				// Error message for having no valid search parameters
 			?>
@@ -468,43 +468,67 @@
     	}
     }
 
-    // Creates form for record info and upload/editting if user is radiologist
+    // Creates form for record info and upload/editting
     function recordForm($type) {
-    ?>    	
-    	<h1>
-			<?php echo ((isset($_GET["rid"]) and $_GET["rid"]) ? 'Record '.$_GET["rid"].'' : 'New Record'); ?>
-	  	</h1>
-    
-    	
-    	
-    <?php
-    }
 
-	// Creates form for uploading
-    function uploadForm($type) {
+    	
+
     	if (isset($_FILES["uploadedPics"])) {
     		for ($i = 0; isset($_FILES["uploadedPics"]["name"][$i]); $i++) {
     			uploadPic(0, $_FILES["uploadedPics"]["tmp_name"][$i], pathinfo(basename($_FILES["uploadedPics"]["name"][$i]),PATHINFO_EXTENSION));
     		}
     	}
-    ?>    	 
-	  	<form method="post" enctype="multipart/form-data">
-	  	<!-- Hidden values -->
-    	<input type="hidden" name="mode" value="upload">
-    		
-	  	<legend>Upload Pictures: </legend>
-	  	<input type="file" name="uploadedPics[]" multiple>
-	  	<fieldset style="height:500px; width:500px; overflow:auto;">
+    ?>    	
+    	<div style="float:left;">
 
-	  	
-	  	</fieldset>
+    	<h1>
+			<?php echo ((isset($_GET["rid"]) and $_GET["rid"]) ? 'Record '.$_GET["rid"].'' : 'New Record'); ?>
+	  	</h1>
 
-	<div style="float:right;">
-		<input type="submit" name="submit" value="Upload" style="margin-top:10px; height:25px; width:180px;">
-		<input type="submit" name="cancel" value="Cancel" style="margin-top:10px; height:25px; width:180px;">
-	</div>
-		</form>
+	  	<form name="record" method="post" enctype="multipart/form-data">
+	  	<!-- Hidden mode -->
+	  	<input type="hidden" name="mode" value="upload">
+
+	  	<!-- Start of date range for test date -->
+			Start Date : <input type="date" name="sdate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}" 
+							<?php
+					       		if (isset($_GET['sdate']) and DateTime::createFromFormat('Y-m-j', $_GET['sdate'])) {
+					       			// If there's a valid start date then set value of input to the submitted date
+					       			echo 'value=', $_GET['sdate'];
+								}
+							?> 
+								style="margin-bottom:10px; height:25px; width:180px;">
+
+			<!-- End of date range for test date -->
+			End Date : <input type="date" name="edate" placeholder="yyyy-mm-dd" pattern="[0-9]{4}+\-[0-9]{1,2}+\-[0-9]{1,2}"
+							<?php
+								if (isset($_GET['edate']) and DateTime::createFromFormat('Y-m-j', $_GET['edate'])) {
+									// If there's a valid end date then set value of input to the submitted date
+									echo 'value=', $_GET['edate'];	
+								}
+							?> 
+								style="margin-bottom:10px; height:25px; width:180px;">
+			<input type="submit" name="search" value="Search" style="margin-left:10px; margin-bottom:10px; height:25px; width:180px;"><br>
+	  		Test Type : <input type="text" name="testType" placeholder="Test Type" 
+    		<?php if (isset($_GET['testType']) and $_GET['testType']) echo 'value='.$_GET['testType'].''; ?>
+    		style="margin-bottom:10px; height:25px; width:180px;"> 
+    		Diagnosis : <input type="text" name="diagnosis" placeholder="Test Type" 
+    		<?php if (isset($_GET['testType']) and $_GET['testType']) echo 'value='.$_GET['testType'].''; ?>
+    		style="margin-bottom:10px; height:25px; width:180px;"> 
+    			  	<legend>Upload Pictures: </legend>
+	  					<input type="file" name="uploadedPics[]" id="uploadedPics" onChange="updatePreview()" multiple>
+	  	<div style="float:right;">
 		
+	</div>
+
+	  	</form>
+
+	  	<textarea name="description" form="record" placeholder="Description" style="padding: 10px 10px 10px 10px; height: 300px; width:100%; overflow:auto;"></textarea>
+	  	<div id="pics" style="height:200px; width:100%, overflow:auto;">
+	  		
+    	</div>
+    	
+    	
     <?php
     }
 
@@ -866,7 +890,7 @@
         		SELECT p.person_id, p.first_name, p.last_name
         		FROM family_doctor fd, persons p
         		WHERE p.person_id = fd.patient_id AND fd.doctor_id = '.$pid.'';
-		else $sql = "SELECT p.person_id, p.first_name, p.last_name, p.address, p.phone FROM persons p";
+		else $sql = "SELECT p.person_id, p.first_name, p.last_name, p.address, p.phone, p.email FROM persons p";
 
         // Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql);
@@ -899,7 +923,7 @@
 	        		while ($info) {
 	        		?>
 	        			<tr onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'" 
-	        				<?php if ($_GET["mode"] == "create") echo 'onClick="selectPerson(\''.$info["PERSON_ID"].'\', \''.$info["FIRST_NAME"].'\', \''.$info["LAST_NAME"].'\', \''.$info["ADDRESS"].'\', \''.$info["PHONE"].'\')"'; ?>>
+	        				<?php if ($_GET["mode"] == "create") echo 'onClick="selectPerson(\''.$info["PERSON_ID"].'\', \''.$info["FIRST_NAME"].'\', \''.$info["LAST_NAME"].'\', \''.$info["ADDRESS"].'\', \''.$info["PHONE"].'\', \''.$info["EMAIL"].'\')"'; ?>>
 							<td align="center" valign="middle"><?php echo $info["PERSON_ID"]; ?></td>	
 							<td><?php echo $info["FIRST_NAME"]; ?></td>
 							<td><?php echo $info["LAST_NAME"]; ?></td>	
@@ -988,12 +1012,13 @@
 	}
 
 	// Selects person from clicking on table entry
-	function selectPerson(person_id, first_name, last_name, address, phone) {
+	function selectPerson(person_id, first_name, last_name, address, phone, email) {
 		document.getElementById('pid').value = person_id;
 		document.getElementById('fname').value = first_name;
 		document.getElementById('lname').value = last_name;
 		document.getElementById('address').value = address;
 		document.getElementById('phone').value = phone;
+		document.getElementById('email').value = email;
 	}
 
 	// Selects user account from clicking on table entry
@@ -1008,7 +1033,7 @@
 		document.getElementById('pid').value = person_id;
 		document.forms['doctor'].submit()
 	}
-	
+
 	// Selects a patient to be removed after confirmation
 	function removePatient (doctor_id, patient_id, first_name, last_name) {
 		if (confirm("Are you should you want to remove patient " + first_name + " " + last_name + "?")) {
@@ -1025,6 +1050,25 @@
 			document.getElementById('apid').value = patient_id;
 			document.forms['doctor'].submit();
 		} 
+	}
+
+
+	function updatePreview() {
+		var div = document.getElementById('pics');
+		var  files = document.getElementById('uploadedPics');
+
+		if ('files' in files) {
+			div.innerHTML = '';
+			for (var i = 0, f; f = files.files[i]; i++) {
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					var span = document.createElement('span');
+					span.innerHTML = '<img src="' + e.target.result + '" style="margin:1px 1px 1px 1px; height:100px; width:100px;"></img>';
+					div.appendChild(span);		
+				}
+				reader.readAsDataURL(files.files[i]);
+			}
+		}
 	}
 
 	// Updates diagnosis data list

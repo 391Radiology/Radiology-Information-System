@@ -36,12 +36,12 @@
 			else $rest_of_query = $rest_of_query." DESC";
 			
 			$sql2 = sprintf($sql, $keyWord,$keyWord,$keyWord,$keyWord);
-			$sql = $sql2.$rest_of_query;		
+			$sql = $sql2.$rest_of_query;	
+
 			?>
 			<div style="display: inline-block; height:600px; overflow:auto;">
 			<table border="1" class="clickable-row" >
 				<th align='center' valign='middle' width='100'>Result</th>
-				<th align='center' valign='middle' width='100'>DEBUG ONLY</th>
 				<th align='center' valign='middle' width='100'>First Name</th>
 				<th align='center' valign='middle' width='100'>Last Name</th>
 				<th align='center' valign='middle' width='100'>Test Date</th>
@@ -70,8 +70,7 @@
 					<tr onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'">
 					<td align='center' valign='middle'<?php echo 'onclick="selectRecord(\''.$record["RID"].'\')"'; ?>
 	        				><?php echo $pos ?></td>
-               <td <?php echo 'onclick="selectRecord(\''.$record["RID"].'\')"'; ?>
-	        				><?php echo $record["RANK"] ?></td>
+
                <td <?php echo 'onclick="selectRecord(\''.$record["RID"].'\')"'; ?>
 	        				><?php echo $record["FIRST_NAME"] ?></td>
                <td <?php echo 'onclick="selectRecord(\''.$record["RID"].'\')"'; ?>

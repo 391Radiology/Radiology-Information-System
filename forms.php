@@ -66,6 +66,7 @@
 					<fieldset>
 					<legend>Update Info:</legend>
 					<!-- Create a selection for account types -->
+
 					Account Type : <select name = "class">
 	    								<?php
 											foreach ($types as $key => $class) {
@@ -166,8 +167,8 @@
    			if (isset($_POST["submitAcc"])) {
    				if ($_POST["npwd"] == $_POST["cpwd"]) {
    					if (!checkUsedUsername()) {
-	   					if (!checkUsedEmail(null)) {
-	   						if ($pid = createPerson()) {
+	   					if ((isset($_POST["pid"]) and $_POST["pid"]) or !checkUsedEmail(null)) {
+	   						if ((isset($_POST["pid"]) and $pid = $_POST["pid"]) or $pid = createPerson()) {
 		   						if (createUser($pid)) {
 		   							?>
 		   							<h1>
@@ -200,11 +201,12 @@
 
 				<form name="account" method="post" style="text-align:right;">
 					<!-- Hidden person id value -->
-					<input type="hidden" name="pid" id="pid" <?php if (isset($_POST['pid'])) echo 'value="'.$_POST['pid'].'"'; ?>>
+					
 
 					<fieldset>
 					<legend>Personal Info:</legend>
 					<!-- Create a selection for account types -->
+					PID: <input type="text" name="pid" id="pid" <?php if (isset($_POST['pid'])) echo 'value="'.$_POST['pid'].'"'; ?> readonly><br>
 					Account Type : <select name = "class">
 	    								<?php
 											foreach ($types as $key => $class) {
@@ -217,21 +219,21 @@
 	  									</select><br>
 
 					<!-- Basic personal information -->
-					First Name : <input type="text" name="fname" placeholder="First Name" maxlength="24"
+					First Name : <input type="text" name="fname" id="fname" placeholder="First Name" maxlength="24"
 										<?php if (isset($_POST['fname'])) echo 'value="'.$_POST['fname'].'"'; ?>
-										style="margin-top:10px; height:25px; width:180px;" required><br>
-					Last Name : <input type="text" name="lname" placeholder="Last Name" maxlength="24"
+										style="margin-top:10px; height:25px; width:180px;" onChange="res()" required><br>
+					Last Name : <input type="text" name="lname" id="lname" placeholder="Last Name" maxlength="24"
 										<?php if (isset($_POST['lname'])) echo 'value="'.$_POST['lname'].'"'; ?>
-										style="margin-top:10px; height:25px; width:180px;" required><br>
-					Address : <input type="text" name="address" placeholder="Address" maxlength="128"
+										style="margin-top:10px; height:25px; width:180px;" onChange="res()" required><br>
+					Address : <input type="text" name="address" id="address" placeholder="Address" maxlength="128"
 										<?php if (isset($_POST['address'])) echo 'value="'.$_POST['address'].'"'; ?>
-										style="margin-top:10px; height:25px; width:180px;"><br>
-					Phone Number : <input type="text" name="phone" placeholder="10 digit phone number" pattern="[0-9]{10}" 
+										style="margin-top:10px; height:25px; width:180px;" onChange="res()"><br>
+					Phone Number : <input type="text" name="phone" id="phone" placeholder="10 digit phone number" pattern="[0-9]{10}" 
 											<?php if (isset($_POST['phone'])) echo 'value="'.$_POST['phone'].'"'; ?>
-											style="margin-top:10px; height:25px; width:180px;"><br>
+											style="margin-top:10px; height:25px; width:180px;" onChange="res()"><br>
 					Email : <input type="email" name="email" placeholder="Email" maxlength="128"
 										<?php if (isset($_POST['email'])) echo 'value="'.$_POST['email'].'"'; ?>
-										style="margin-top:10px; height:25px; width:180px;"><br>
+										style="margin-top:10px; height:25px; width:180px;" onChange="res()"><br>
 
 					<div <?php echo 'style='.(isset($_SESSION["infoErr"]) ? "color:red;" : "color:black;").''; ?>>
 		            <?php
@@ -864,7 +866,7 @@
         		SELECT p.person_id, p.first_name, p.last_name
         		FROM family_doctor fd, persons p
         		WHERE p.person_id = fd.patient_id AND fd.doctor_id = '.$pid.'';
-		else $sql = "SELECT p.person_id, p.first_name, p.last_name FROM persons p";
+		else $sql = "SELECT p.person_id, p.first_name, p.last_name, p.address, p.phone FROM persons p";
 
         // Prepare sql using conn and returns the statement identifier
         $stid = oci_parse($conn, $sql);
@@ -887,19 +889,32 @@
 	        			<th width="100" align="center" valign="middle">ID</th>
 	        			<th width="100" align="center" valign="middle">First Name</th>
 	        			<th width="100" align="center" valign="middle">Last Name</th>
+	        			<?php 
+	        				if ($_GET["mode"] != "create") {
+	        					?>
 	        			<th width="100" align="center" valign="middle"></th>
+	        			
 	        	<?php
+	        			}
 	        		while ($info) {
 	        		?>
-	        			<tr onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'">
+	        			<tr onMouseover="this.bgColor='#ADD8E6'" onMouseout="this.bgColor='#FFFFFF'" 
+	        				<?php if ($_GET["mode"] == "create") echo 'onClick="selectPerson(\''.$info["PERSON_ID"].'\', \''.$info["FIRST_NAME"].'\', \''.$info["LAST_NAME"].'\', \''.$info["ADDRESS"].'\', \''.$info["PHONE"].'\')"'; ?>>
 							<td align="center" valign="middle"><?php echo $info["PERSON_ID"]; ?></td>	
 							<td><?php echo $info["FIRST_NAME"]; ?></td>
 							<td><?php echo $info["LAST_NAME"]; ?></td>	
-							<td>
+							<?php
+							
+								if ($_GET["mode"] != "create") {
+									?>
+									<td>
 								<input type="button" name="addPatient" id="addPatient" value="Add" 
 										<?php echo 'onclick="addPatient(\''.$pid.'\', \''.$info["PERSON_ID"].'\', \''.$info["FIRST_NAME"].'\', \''.$info["LAST_NAME"].'\')"'; ?>
 										style="width:100%;">
 							</td>
+							<?php
+								}
+							?>
 						</tr>
 	        		<?php
 	        			$info = oci_fetch_array($stid);
@@ -967,6 +982,19 @@
 		newdiv.innerHTML = '<input type="text" name="key[]" style="margin-bottom:1px; height:25px; width:180px;"><br>';
 		document.getElementById('keywordsList').appendChild(newdiv);
 	}			
+
+	function res() {
+		document.getElementById('pid').value = "";
+	}
+
+	// Selects person from clicking on table entry
+	function selectPerson(person_id, first_name, last_name, address, phone) {
+		document.getElementById('pid').value = person_id;
+		document.getElementById('fname').value = first_name;
+		document.getElementById('lname').value = last_name;
+		document.getElementById('address').value = address;
+		document.getElementById('phone').value = phone;
+	}
 
 	// Selects user account from clicking on table entry
 	function selectUser(user_name, person_id) {

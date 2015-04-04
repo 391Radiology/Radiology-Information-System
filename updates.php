@@ -74,7 +74,6 @@
 
 	// Inserts a person entry
 	function createPerson() {
-
 	    	// Establish connection
 	        $conn = connect();
 	        if (!$conn) {

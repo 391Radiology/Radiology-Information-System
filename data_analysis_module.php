@@ -21,10 +21,10 @@
 				$sql.='TEST_DATE, ';
 				}
 			if ($timeperiod == 'w'){
-				$sql.=' to_char(test_date, \'IW\'),';
+				$sql.=' to_char(test_date, \'IW\'),EXTRACT(YEAR from test_date),';
 				}
 			if ($timeperiod == 'm'){
-				$sql.='to_char(test_date, \'MON\'), ';
+				$sql.='to_char(test_date, \'MON\'),EXTRACT(YEAR from test_date),';
 				}
 			if ($timeperiod == 'y'){
 				$sql.=' EXTRACT(YEAR from test_date),';
@@ -46,10 +46,10 @@
 					$sql.='TEST_DATE,';
 				}
 				if ($timeperiod == 'w'){
-					$sql.=' to_char(test_date, \'IW\'),';
+					$sql.=' to_char(test_date, \'IW\'),EXTRACT(YEAR from test_date),';
 				}
 				if ($timeperiod == 'm'){
-					$sql.='to_char(test_date, \'MON\'),';
+					$sql.='to_char(test_date, \'MON\'),EXTRACT(YEAR from test_date),';
 				}
 				if ($timeperiod == 'y'){
 					$sql.=' EXTRACT(YEAR from test_date),';
@@ -59,6 +59,11 @@
 				$sql = rtrim($sql, ",");
 				$sql.=" ) ";
 				}
+			if (!empty($fname)){
+				$sql.='ORDER BY FIRST_NAME';
+				}if (!empty($test_type)){
+					$sql.='ORDER BY TEST_TYPE';
+					}
 			    
 			//echo $sql;	
 		
@@ -115,7 +120,22 @@
 					 		
 					 		echo '<td>'.$info["FIRST_NAME"].' '.$info["LAST_NAME"].'</td>'	;
 					 		echo '<td>'.$info["TEST_TYPE"].'</td>'	;
-					 	if ($timeperiod != 'n'){
+					 	if ($timeperiod == 'm'||$timeperiod == 'w'){
+					 		
+							if (!empty($fname)&&!empty($test_type)){
+								echo '<td>' .$info[3].' '.$info[4].'</td>'	;
+								}
+							if (!empty($fname)&&empty($test_type)){
+								echo '<td>' .$info[2].' '.$info[3].'</td>'	;
+								}
+							if (empty($fname)&&!empty($test_type)){
+								echo '<td>' .$info[1].' '.$info[2].'</td>'	;
+								}
+							if (empty($fname)&&empty($test_type)){
+								echo '<td>' .$info[0].' '.$info[1].'</td>'	;
+								}	 		
+					 		}
+					 	if ($timeperiod == 'y'){
 					 		
 							if (!empty($fname)&&!empty($test_type)){
 								echo '<td>' .$info[3].'</td>'	;
@@ -130,7 +150,7 @@
 								echo '<td>' .$info[0].'</td>'	;
 								}	 		
 					 		}
-					 		echo '<td>'.$info["COUNT(IMAGE_ID)"].'</td>'	;
+					 	echo '<td>'.$info["COUNT(IMAGE_ID)"].'</td>'	;
 							
 					 	?>
 						
